@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Masar Manufacturing Portal</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+            <span class="px-2 py-0.2 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              InvenTree Architecture
+            </span>
+          </div>
+          <span class="text-gray-400 text-[11px]">System Settings & Workspace Customization</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong class="text-emerald-300 font-medium">OIDC / Dev Bypass Active</strong></span>
+        </div>
+        <div class="text-gray-300">
+          User: <strong class="text-white">Dr. Alice Vance</strong> <span class="text-gray-400">(Lead Optical QA)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1">
+    <!-- Breadcrumb -->
+    <div class="text-xs text-gray-500 mb-4 flex items-center space-x-2">
+      <a href="index.html" class="hover:text-indigo-600 font-medium">Masar Hub</a>
+      <span>/</span>
+      <span class="font-semibold text-gray-800 uppercase tracking-wider text-[11px]">
+        System Settings & InvenTree Customization
+      </span>
+    </div>
+
+    <!-- Title & Controls Header -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-6 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h1 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+          <span>⚙️</span>
+          <span>System Settings & Customizable Workspace</span>
+        </h1>
+        <p class="text-xs text-gray-500 mt-1 max-w-2xl">
+          Configure OpenID Connect authentication parameters, controlled product baselines, and save/load custom layout presets similar to InvenTree.
+        </p>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <span class="font-mono bg-slate-100 text-slate-700 px-3 py-1 rounded-lg border border-slate-200 font-bold">
+          Engine: Python Django 5.2
+        </span>
+        <button onclick="loadSettings()" class="px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors flex items-center space-x-1">
+          <span>↻</span><span>Refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- InvenTree-Style Settings Tabs -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-6">
+      <div class="inventree-tabs border-b border-gray-200 bg-gray-50/50">
+        <button id="tab-btn-system" onclick="switchSettingsTab('system')" class="inventree-tab-btn active">
+          <span>🔒</span><span>System & OIDC Authentication</span>
+        </button>
+        <button id="tab-btn-baselines" onclick="switchSettingsTab('baselines')" class="inventree-tab-btn">
+          <span>📐</span><span>Product Baselines</span>
+        </button>
+        <button id="tab-btn-customization" onclick="switchSettingsTab('customization')" class="inventree-tab-btn">
+          <span>🎨</span><span>Workspace Customization (Save & Load)</span>
+        </button>
+      </div>
+
+      <div class="p-6">
+        <!-- 1. System & OIDC Tab -->
+        <div id="tab-pane-system" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+          <!-- OIDC Auth Card -->
+          <div class="bg-slate-50/60 border border-gray-200 rounded-xl p-5 space-y-4">
+            <h2 class="text-sm font-bold text-gray-900 border-b border-gray-200 pb-2">
+              OIDC Authentication & Bypass Controls
+            </h2>
+            <div>
+              <label class="block text-gray-500 text-[11px] mb-1 font-medium">OIDC Identity Provider</label>
+              <input type="text" id="settings-oidc-provider" readonly value="Keycloak Enterprise" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-mono text-gray-800">
+            </div>
+            <div>
+              <label class="block text-gray-500 text-[11px] mb-1 font-medium">Issuer Discovery URL</label>
+              <input type="text" id="settings-issuer-url" readonly value="https://auth.qkd.internal/auth/realms/manufacturing" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-mono text-gray-800">
+            </div>
+            <div>
+              <label class="block text-gray-500 text-[11px] mb-1 font-medium">Client ID</label>
+              <input type="text" id="settings-client-id" readonly value="masar-manufacturing-portal" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-mono text-gray-800">
+            </div>
+            <div id="settings-bypass-badge" class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-bold text-emerald-800">Developer Auth Bypass Active</span>
+              </div>
+              <p class="text-[11px] text-emerald-700 mt-1">
+                Requests authenticated via <code class="font-mono font-bold">X-Bypass-Token</code> header or local dev session.
+              </p>
+            </div>
+          </div>
+
+          <!-- Document Repo Card -->
+          <div class="bg-slate-50/60 border border-gray-200 rounded-xl p-5 space-y-4">
+            <h2 class="text-sm font-bold text-gray-900 border-b border-gray-200 pb-2">
+              Controlled Document Repository
+            </h2>
+            <p class="text-gray-600 text-xs leading-relaxed">
+              Cryptographically signed firmware images, optical test reports (PDF), and CAD drawing packages are archived under controlled document authority.
+            </p>
+            <div>
+              <label class="block text-gray-500 text-[11px] mb-1 font-medium">Controlled Repository URL</label>
+              <input type="text" id="settings-repo-url" readonly value="https://docs.qkd.internal/controlled-repo" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white font-mono text-gray-800">
+            </div>
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 space-y-1">
+              <span class="font-bold block">InvenTree Plugin & SCIM Ready</span>
+              <p class="text-[11px] text-blue-700">Django SCIM and API token integration active for enterprise SSO and automated line testing.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Product Baselines Tab -->
+        <div id="tab-pane-baselines" class="hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Controlled Engineering Baselines</h3>
+          </div>
+          <div id="settings-baselines-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Baselines injected -->
+          </div>
+        </div>
+
+        <!-- 3. Workspace Customization Tab (Save & Load Presets) -->
+        <div id="tab-pane-customization" class="hidden space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Left: Saved Presets Management -->
+            <div class="bg-slate-50/60 border border-gray-200 rounded-xl p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-gray-200 pb-2">
+                <h3 class="text-sm font-bold text-gray-900">Saved Customization Presets</h3>
+                <button onclick="MasarLayout.openCustomizer()" class="px-2.5 py-1 bg-indigo-600 text-white font-bold rounded text-xs hover:bg-indigo-700">
+                  + Create New Preset
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 leading-relaxed">
+                Save distinct operational layouts (e.g. for Cleanroom Operators, QA Inspectors, or Executive Dashboards) and switch between them instantly.
+              </p>
+              <div id="presets-list-container" class="space-y-2.5">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Right: Export / Import JSON & Active Layout Settings -->
+            <div class="bg-slate-50/60 border border-gray-200 rounded-xl p-5 space-y-4">
+              <h3 class="text-sm font-bold text-gray-900 border-b border-gray-200 pb-2">
+                Export & Import Customization (JSON)
+              </h3>
+              <p class="text-xs text-gray-500 leading-relaxed">
+                Export your current workspace customization configuration to a shareable JSON file or restore from a team configuration.
+              </p>
+              <div class="flex space-x-3">
+                <button onclick="MasarLayout.exportPresetJSON()" class="flex-1 py-2.5 bg-white hover:bg-gray-100 border border-gray-300 font-bold rounded-lg text-gray-800 text-xs shadow-sm flex items-center justify-center space-x-1.5">
+                  <span>📥</span><span>Export JSON Configuration</span>
+                </button>
+                <label class="flex-1 py-2.5 bg-white hover:bg-gray-100 border border-gray-300 font-bold rounded-lg text-gray-800 text-xs shadow-sm flex items-center justify-center space-x-1.5 cursor-pointer text-center">
+                  <span>📤</span><span>Import Preset File</span>
+                  <input type="file" accept=".json" onchange="MasarLayout.importPresetJSON(event)" class="hidden">
+                </label>
+              </div>
+
+              <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 mt-4">
+                <span class="font-bold text-emerald-900 block text-xs">Customization Storage:</span>
+                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                  All layout configurations, pinned sidebar trees, and card arrangements are persisted in both local browser storage and the backend Django database (<code class="font-mono font-bold">customization_presets</code> table).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="mt-auto border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <span>Masar • © Technology Innovation Institute 2026. All Rights Reserved.</span>
+      <span class="font-mono text-[11px] text-gray-400">TII Industrial Execution</span>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/settings.js"></script>
+  <script>
+    function switchSettingsTab(tab) {
+      ['system', 'baselines', 'customization'].forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const pane = document.getElementById(`tab-pane-${t}`);
+        if (btn && pane) {
+          if (t === tab) {
+            btn.classList.add('active');
+            pane.classList.remove('hidden');
+          } else {
+            btn.classList.remove('active');
+            pane.classList.add('hidden');
+          }
+        }
+      });
+      if (tab === 'customization') renderSettingsPresetsList();
+    }
+
+    async function renderSettingsPresetsList() {
+      const container = document.getElementById('presets-list-container');
+      if (!container) return;
+      try {
+        const res = await apiFetch('/customization/presets');
+        if (res && res.success && Array.isArray(res.data)) {
+          container.innerHTML = res.data.map(p => `
+            <div class="p-3 bg-white rounded-lg border ${p.is_active ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-gray-200'} shadow-sm flex items-center justify-between">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-gray-900">${p.name}</span>
+                  ${p.is_active ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Active</span>' : ''}
+                </div>
+                <p class="text-[11px] text-gray-500 mt-0.5">${p.description || 'Workspace configuration profile'}</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                ${!p.is_active ? `
+                  <button onclick="applyPresetFromSettings('${p.id}')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold text-xs">
+                    Load
+                  </button>
+                ` : '<span class="text-xs text-emerald-600 font-bold">Loaded</span>'}
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        container.innerHTML = '<span class="text-rose-500">Failed to load presets</span>';
+      }
+    }
+
+    async function applyPresetFromSettings(presetId) {
+      try {
+        const res = await apiFetch(`/customization/presets/${presetId}/apply`, { method: 'POST' });
+        if (res && res.success) {
+          await MasarLayout.loadCustomization();
+          renderSettingsPresetsList();
+          alert('Preset applied successfully!');
+        }
+      } catch (e) {
+        alert('Failed to apply preset: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>

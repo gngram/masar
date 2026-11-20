@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masar - Production Traceability Platform</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script>
+    (function() {
+      try {
+        var token = localStorage.getItem('masar_token') || localStorage.getItem('qtrace_token');
+        if (!token) {
+          document.documentElement.classList.add('auth-guest');
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- TII-QKD-Style Global Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+          </div>
+          <span class="text-gray-400 text-[11px]">Production Traceability Platform</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <div id="header-pu-switcher" class="hidden flex items-center space-x-1.5 px-2.5 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="text-emerald-400">🏭</span>
+          <span class="text-[11px] font-semibold text-gray-400">Unit:</span>
+          <select id="header-pu-select" onchange="AdminPortal.switchProductionUnit(this.value)" class="bg-gray-900 text-emerald-300 font-mono font-bold text-xs rounded px-2 py-0.5 border border-gray-600 focus:outline-none cursor-pointer">
+          </select>
+        </div>
+        <div id="header-auth-badge" class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong class="text-emerald-300 font-medium">Checking Session...</strong></span>
+        </div>
+        <div id="header-user-display" class="text-gray-300">
+          User: <span class="text-gray-400">Loading...</span>
+        </div>
+        <button id="header-signout-btn" onclick="AdminPortal.signOut()" class="hidden px-2.5 py-1 bg-gray-800 hover:bg-rose-900/60 hover:text-rose-200 hover:border-rose-700 text-gray-300 border border-gray-700 rounded text-xs transition-colors font-medium">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+
+    <!-- Navigation Bar (for tenant users) -->
+    <div id="tenant-nav-bar" class="max-w-7xl mx-auto px-6 flex space-x-1 overflow-x-auto text-xs font-semibold uppercase tracking-wider">
+      <a href="index.html" class="px-4 py-2.5 border-b-2 border-indigo-500 text-white bg-gray-800/60 font-bold transition-all flex items-center space-x-1">
+        <span>🏠</span><span>Main Hub</span>
+      </a>
+      <a href="dashboard.html" class="px-4 py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📊</span><span>Dashboard</span>
+      </a>
+      <a href="production.html" class="px-4 py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏭</span><span>Production Status</span>
+      </a>
+      <a href="parts.html" class="px-4 py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🧩</span><span>Parts & BoM</span>
+      </a>
+      <a href="stock.html" class="px-4 py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📦</span><span>Cleanroom Stock</span>
+      </a>
+      <a href="procurement.html" class="px-4 py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📑</span><span>Procurement</span>
+      </a>
+      <a href="settings.html" class="px-4 py-2.5 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>⚙️</span><span>Settings</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1">
+
+    <!-- ============================================================= -->
+    <!-- 1. LOGIN GATE VIEW (Displayed when unauthenticated) -->
+    <!-- ============================================================= -->
+    <section id="section-login" class="hidden max-w-md mx-auto my-12">
+      <div class="bg-white border border-gray-100 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500"></div>
+
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 mx-auto mb-3 shadow-lg rounded-2xl overflow-hidden shadow-indigo-200">
+            <img src="assets/masar-logo.svg" alt="Masar" class="w-16 h-16">
+          </div>
+          <div class="flex items-center justify-center space-x-2">
+            <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">MASAR</h2>
+            <span class="text-xs px-2 py-0.5 rounded font-bold bg-teal-50 text-teal-700 border border-teal-200">مسار</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Industrial Execution & Multi-Facility Traceability Engine</p>
+        </div>
+
+        <!-- Tab Switcher: Sign In vs Accept Invitation & Register -->
+        <div class="flex border-b border-gray-200 mb-5 text-xs font-bold">
+          <button type="button" id="tab-login-signin" onclick="AdminPortal.switchLoginTab('signin')"
+                  class="flex-1 py-2.5 text-center border-b-2 border-indigo-600 text-indigo-600 transition-all">
+            Sign In
+          </button>
+          <button type="button" id="tab-login-register" onclick="AdminPortal.switchLoginTab('register')"
+                  class="flex-1 py-2.5 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-700 transition-all">
+            Accept Invitation & Register
+          </button>
+        </div>
+
+        <!-- Feedback Alerts -->
+        <div id="login-error-msg" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs font-semibold"></div>
+        <div id="login-success-msg" class="hidden mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs font-semibold"></div>
+
+        <!-- 1. Sign In Form -->
+        <form id="form-login-signin" onsubmit="AdminPortal.handleLoginSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1" for="login-email">
+              Email Address
+            </label>
+            <input type="email" id="login-email" required
+                   placeholder="operator@tii.ae or admin@qkd.internal"
+                   class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-gray-800">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1" for="login-password">
+              Password
+            </label>
+            <input type="password" id="login-password" required
+                   placeholder="••••••••••••"
+                   class="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-gray-800">
+          </div>
+
+          <button type="submit" id="login-submit-btn"
+                  class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-md hover:shadow transition-all flex items-center justify-center space-x-2">
+            <span>Sign In</span>
+            <span class="text-xs">→</span>
+          </button>
+        </form>
+
+        <!-- 2. Accept Invitation & Register Form -->
+        <form id="form-login-register" onsubmit="AdminPortal.handleInvitationRegisterSubmit(event)" class="hidden space-y-3">
+          <div class="p-2.5 bg-indigo-50 border border-indigo-200 rounded-lg text-[11px] text-indigo-900 leading-relaxed">
+            <strong>Invitation Registration:</strong> Enter the email address and one-time password (OTP) provided by your administrator. You must provide your Full Name and create a new password to activate your account.
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1" for="invite-reg-email">
+              Invited Email Address
+            </label>
+            <input type="email" id="invite-reg-email" required
+                   placeholder="invited.user@tii.ae"
+                   class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1" for="invite-reg-otp">
+              One-Time Password (OTP)
+            </label>
+            <input type="password" id="invite-reg-otp" required
+                   placeholder="Enter temporary OTP password"
+                   class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1" for="invite-reg-name">
+              Your Full Name
+            </label>
+            <input type="text" id="invite-reg-name" required
+                   placeholder="e.g. Dr. Alice Vance"
+                   class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider" for="invite-reg-newpass">
+                New Password
+              </label>
+              <span class="text-[10px] text-gray-400">Min 8 chars, letters & digits</span>
+            </div>
+            <input type="password" id="invite-reg-newpass" required
+                   placeholder="Enter new permanent password"
+                   class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1" for="invite-reg-confirmpass">
+              Confirm New Password
+            </label>
+            <input type="password" id="invite-reg-confirmpass" required
+                   placeholder="Confirm new permanent password"
+                   class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+          </div>
+
+          <button type="submit" id="invite-reg-submit-btn"
+                  class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-md hover:shadow transition-all flex items-center justify-center space-x-2">
+            <span>Activate Account & Sign In</span>
+            <span class="text-xs">→</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+
+    <!-- ============================================================= -->
+    <!-- 2. SERVER ADMIN GOVERNANCE CONSOLE (Orgs -> PUs -> PU Users)  -->
+    <!-- ============================================================= -->
+    <section id="section-admin-portal" class="hidden space-y-6">
+      <!-- Breadcrumb Trail -->
+      <div class="text-xs text-gray-500 mb-2 flex items-center space-x-2" id="admin-breadcrumbs">
+        <!-- Rendered by AdminPortal -->
+      </div>
+
+      <!-- Dynamic Content Area (Organizations Grid -> PUs Grid -> PU Users List) -->
+      <div id="admin-content-area">
+        <!-- Injected dynamically by AdminPortal -->
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 2.5 MULTI-PRODUCTION UNIT SELECTION                           -->
+    <!-- For PU Admins & Members who belong to multiple Production Units -->
+    <!-- ============================================================= -->
+    <section id="section-pu-selection" class="hidden space-y-6">
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2 mb-1">
+            <span class="px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-bold font-mono">
+              Facility Selection
+            </span>
+            <span class="text-xs text-gray-400">·</span>
+            <span id="pu-selection-count-badge" class="text-xs text-gray-500 font-medium">Multiple Lines Assigned</span>
+          </div>
+          <h1 class="text-xl font-bold text-gray-900">
+            My Production Units
+          </h1>
+          <p class="text-xs text-gray-500 mt-1">
+            You hold administration or operational responsibilities across multiple production lines. Select a facility card below to enter its workspace.
+          </p>
+        </div>
+      </div>
+
+      <div id="pu-selection-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered dynamically by AdminPortal.renderPUSelectionCards() -->
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- 3. TENANT MANUFACTURING HUB (For Engineers, QA, Operators)   -->
+    <!-- ============================================================= -->
+    <section id="section-tenant-hub" class="hidden space-y-6">
+      <!-- Breadcrumb -->
+      <div class="text-xs text-gray-500 mb-4 flex items-center space-x-2">
+        <a href="index.html" class="hover:text-indigo-600 font-medium">Masar Hub</a>
+        <span id="tenant-breadcrumb-pu-sep" class="hidden">/</span>
+        <a href="javascript:void(0)" onclick="AdminPortal.showPUSelection()" id="tenant-breadcrumb-pu-link" class="hidden hover:text-indigo-600 font-medium">My Production Units</a>
+        <span>/</span>
+        <span id="tenant-breadcrumb-active-pu" class="font-semibold text-gray-800 uppercase tracking-wider text-[11px]">
+          Manufacturing Overview
+        </span>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">
+            QKD Manufacturing Execution & Traceability Hub
+          </h1>
+          <p class="text-xs text-gray-500 mt-1">
+            Automated Single Source of Truth for QKD Sender (Alice) and Receiver (Bob) modules, baselines, cleanroom stock, and optical characterization.
+          </p>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-semibold border border-indigo-200">
+            TII-QKD Industrial Flow
+          </span>
+          <button onclick="MasarLayout.openCustomizer()" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded font-bold transition-colors flex items-center space-x-1">
+            <span>🎨</span><span>Customize View</span>
+          </button>
+          <button onclick="loadAllCards()" id="hub-refresh-btn" class="px-3 py-1 bg-white hover:bg-gray-100 border border-gray-300 rounded text-gray-700 font-medium transition-colors">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Core Cards Grid (Includes PU Admin Authority Card for Admins) -->
+      <div id="hub-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Admin Authority Card (Prominently rendered for PU Admins & Server Admin) -->
+        <a href="pipeline.html" id="hub-admin-card" class="hidden group bg-gradient-to-br from-amber-50/70 to-white border-2 border-amber-300 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-amber-500 transition-all flex flex-col justify-between card-hover-effect cursor-pointer">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="w-14 h-14 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-800 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide bg-amber-200 text-amber-900 border border-amber-300 font-mono">
+                👑 Server Admin
+              </span>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-amber-800 transition-colors">Line Administration</h2>
+            <p class="text-xs text-gray-600 mt-1 leading-relaxed">
+              Define pipeline stages, sequence quality gates, assign pipeline administrators, and invite cleanroom members with stage-specific authorizations.
+            </p>
+            <div class="mt-4 pt-4 border-t border-amber-200/60 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-white/80 p-2 rounded border border-amber-100">
+                <span class="text-gray-500 text-[10px] block font-medium">Pipeline Stages</span>
+                <span id="hub-admin-stages-count" class="font-bold text-gray-800 text-sm">--</span>
+              </div>
+              <div class="bg-white/80 p-2 rounded border border-amber-100">
+                <span class="text-gray-500 text-[10px] block font-medium">Line Personnel</span>
+                <span id="hub-admin-users-count" class="font-bold text-amber-800 text-sm">--</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-bold text-amber-800 pt-3 border-t border-amber-200/60 group-hover:text-amber-900 transition-colors">
+            <span>Open Pipeline Flow & Team Governance</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+
+        <!-- Dashboard Card -->
+        <a href="dashboard.html" class="group bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-indigo-400 transition-all flex flex-col justify-between card-hover-effect">
+          <div>
+            <div class="w-14 h-14 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">Dashboard</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              High-level manufacturing analytics, factory floor KPIs, production yield rates, active bottlenecks, and stage throughput.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Units in Prod</span>
+                <span id="hub-dash-units" class="font-bold text-gray-800 text-sm">--</span>
+              </div>
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">First-Pass Yield</span>
+                <span id="hub-dash-yield" class="font-bold text-emerald-600 text-sm">--</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-semibold text-indigo-600 pt-3 border-t border-gray-100">
+            <span>Open Dashboard Page</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+
+        <!-- InvenTree Parts & BoM Card -->
+        <a href="parts.html" id="hub-parts-card" class="group bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-cyan-400 transition-all flex flex-col justify-between card-hover-effect">
+          <div>
+            <div class="w-14 h-14 rounded-lg bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600 mb-4 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+              <span class="text-2xl">🧩</span>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-cyan-600 transition-colors">Parts & BoM Explorer</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              InvenTree-style multi-level parts catalog, category tree navigation, hierarchical bill of materials, and checksum verification.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Active Parts</span>
+                <span class="font-bold text-gray-800 text-sm">5 SKUs</span>
+              </div>
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Assemblies</span>
+                <span class="font-bold text-cyan-700 text-sm">Alice & Bob</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-semibold text-cyan-600 pt-3 border-t border-gray-100">
+            <span>Open InvenTree Parts</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+
+        <!-- Production Status Card -->
+        <a href="production.html" class="group bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col justify-between card-hover-effect">
+          <div>
+            <div class="w-14 h-14 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">Production Status</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              Traceability register for Sender & Receiver serials, System/Set ID pair links, baselines, rework tickets, deviations, and test reports.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Alice (Tx)</span>
+                <span id="hub-prod-alice" class="font-bold text-gray-800 text-sm">--</span>
+              </div>
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Bob (Rx)</span>
+                <span id="hub-prod-bob" class="font-bold text-gray-800 text-sm">--</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-semibold text-emerald-600 pt-3 border-t border-gray-100">
+            <span>Open Production Register</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+
+        <!-- Stock & Cleanroom Inventory Card -->
+        <a href="stock.html" class="group bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-amber-400 transition-all flex flex-col justify-between card-hover-effect">
+          <div>
+            <div class="w-14 h-14 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-amber-600 transition-colors">Stock & Inventory</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              Serialized inventory tracking for lasers, single-photon detectors, FPGAs, and optical passives.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Total Items</span>
+                <span id="hub-stock-total" class="font-bold text-gray-800 text-sm">--</span>
+              </div>
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Low Stock Alert</span>
+                <span id="hub-stock-low" class="font-bold text-amber-600 text-sm">--</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-semibold text-amber-600 pt-3 border-t border-gray-100">
+            <span>Open Cleanroom Stock</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+
+        <!-- Procurement Card -->
+        <a href="procurement.html" class="group bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-purple-400 transition-all flex flex-col justify-between card-hover-effect">
+          <div>
+            <div class="w-14 h-14 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors">Procurement</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              Purchase orders, bill of materials requisition, supplier management, and goods receipt inspection.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Active POs</span>
+                <span id="hub-proc-orders" class="font-bold text-gray-800 text-sm">--</span>
+              </div>
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Total Committed</span>
+                <span id="hub-proc-amount" class="font-bold text-purple-600 text-sm">--</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-semibold text-purple-600 pt-3 border-t border-gray-100">
+            <span>Open Procurement</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+
+        <!-- Settings Card -->
+        <a href="settings.html" class="group bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md hover:border-slate-400 transition-all flex flex-col justify-between card-hover-effect">
+          <div>
+            <div class="w-14 h-14 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 mb-4 group-hover:bg-slate-800 group-hover:text-white transition-colors">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-slate-800 transition-colors">Settings</h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              OIDC identity parameters, dev bypass credentials, product baseline definitions, and repository links.
+            </p>
+            <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">OIDC Mode</span>
+                <span id="hub-settings-oidc" class="font-bold text-gray-800 text-sm">Keycloak</span>
+              </div>
+              <div class="bg-slate-50 p-2 rounded">
+                <span class="text-gray-500 text-[10px] block">Dev Bypass</span>
+                <span id="hub-settings-bypass" class="font-bold text-emerald-600 text-sm">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center justify-between text-xs font-semibold text-slate-700 pt-3 border-t border-gray-100">
+            <span>Configure Portal</span>
+            <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ============================================================= -->
+  <!-- MODAL: ADD PRODUCTION UNIT                                    -->
+  <!-- ============================================================= -->
+  <div id="modal-add-pu" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>🏭</span><span>Add Production Unit</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-3 border-b border-gray-100">
+        Provision a new dedicated Production Facility and Cleanroom Line
+      </p>
+
+      <div id="new-pu-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs"></div>
+
+      <form onsubmit="AdminPortal.submitAddPU(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="new-pu-code">Production Unit Code</label>
+          <input type="text" id="new-pu-code" required placeholder="e.g. PU-OPT-CLEANROOM"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="new-pu-name">Unit Name</label>
+          <input type="text" id="new-pu-name" required placeholder="e.g. Quantum Optical Assembly"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="new-pu-desc">Description</label>
+          <textarea id="new-pu-desc" rows="2" placeholder="Cleanroom facility description..."
+                    class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">Create Production Unit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: CONFIRM DELETION (ORG & PU)                            -->
+  <!-- ============================================================= -->
+  <div id="modal-confirm-delete" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 id="confirm-delete-title" class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span class="text-rose-500">🗑️</span><span>Confirm Deletion</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <p id="confirm-delete-message" class="text-xs text-gray-600 mb-3 leading-relaxed">
+        Are you sure you want to delete this entity? This action cannot be undone.
+      </p>
+
+      <div id="confirm-delete-subtext" class="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-[11px] mb-4">
+        <strong>Impact:</strong> If users belong to multiple organizations or production units, only the reference to this entity will be removed. Users belonging exclusively to this organization will be removed.
+      </div>
+
+      <div id="confirm-delete-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs"></div>
+
+      <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+        <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+        <button type="button" id="confirm-delete-btn" onclick="AdminPortal.submitConfirmDelete()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow-sm">Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: INVITE LINE USER TO PRODUCTION UNIT                    -->
+  <!-- ============================================================= -->
+  <div id="modal-invite-pu-user" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>📨</span><span>Invite Member to Production Line</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
+        Inviting user to <strong id="invite-pu-name-modal" class="text-gray-800">Production Unit</strong>
+      </p>
+
+      <div class="p-3 bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-lg text-[11px] mb-4">
+        <strong>Invitation Model:</strong> User is enrolled with inactive status. They will receive their temporary password and complete their registration (providing their Full Name and choosing their permanent password) via the <em>Accept Invitation & Register</em> tab on the sign-in page.
+      </div>
+
+      <div id="invite-pu-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold"></div>
+
+      <form onsubmit="AdminPortal.submitInvitePUUser(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="invite-user-email">Member Email Address</label>
+          <input type="email" id="invite-user-email" required placeholder="engineer.optic@tii.ae"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-gray-700" for="invite-user-otp">One-Time Password (OTP)</label>
+            <button type="button" onclick="AdminPortal.generateRandomOTP('invite-user-otp')" class="text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold">
+              🎲 Generate Secure OTP
+            </button>
+          </div>
+          <div class="relative">
+            <input type="password" id="invite-user-otp" required placeholder="Temporary password (min 8 chars)"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-16 font-mono">
+            <button type="button" onclick="AdminPortal.togglePasswordVisibility('invite-user-otp')"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-gray-500 hover:text-gray-700 px-1.5 py-0.5 rounded hover:bg-gray-100">
+              Show
+            </button>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-1">Convey this temporary one-time password to the invited member.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-2">Assign Initial Roles (Select One or More)</label>
+          <div id="invite-roles-checkboxes" class="space-y-2 border border-gray-200 rounded-lg p-3 bg-gray-50/50 max-h-48 overflow-y-auto text-xs">
+            <!-- Dynamically populated with built-in and custom roles -->
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="invite-stage-scope">Target Pipeline Stage Assignment</label>
+          <select id="invite-stage-scope" class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="">🏢 Facility-Wide (All Pipeline Stages)</option>
+            <!-- Dynamically populated with active pipeline stages -->
+          </select>
+          <p class="text-[10px] text-gray-400 mt-1">Scope member's roles to a specific pipeline stage or authorize across the entire line.</p>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Send Invitation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: ADD ROLE TO USER                                       -->
+  <!-- ============================================================= -->
+  <div id="modal-add-user-role" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>➕</span><span>Assign Role to User</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Granting role to <strong id="target-user-role-name" class="text-gray-800">User</strong>
+      </p>
+
+      <div id="add-role-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold"></div>
+
+      <form onsubmit="AdminPortal.submitAddUserRole(event)" class="space-y-4">
+        <input type="hidden" id="target-user-role-id">
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="select-role-to-add">Select Role</label>
+          <select id="select-role-to-add" required class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="add-role-stage-scope">Target Pipeline Stage Assignment</label>
+          <select id="add-role-stage-scope" class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="">🏢 Facility-Wide (All Pipeline Stages)</option>
+            <!-- Dynamically populated with active pipeline stages -->
+          </select>
+          <p class="text-[10px] text-gray-400 mt-1">Scope role authorization to a specific pipeline gate or grant line-wide.</p>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Grant Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: MANAGE PIPELINE STAGES                                 -->
+  <!-- ============================================================= -->
+  <div id="modal-manage-stages" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>⚙️</span><span>Production Pipeline Stages</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Configured manufacturing stages and quality gates for <strong id="stages-pu-name-modal" class="text-gray-800">Production Unit</strong>
+      </p>
+
+      <div id="stages-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold"></div>
+
+      <!-- Current Stages List -->
+      <div class="mb-6 space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-600">Active Sequence & Quality Gates</h4>
+        <div id="stages-list-container" class="space-y-2 text-xs">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Add New Stage Form -->
+      <div class="p-4 bg-slate-50 border border-gray-200 rounded-xl space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-800 flex items-center space-x-1">
+          <span>➕</span><span>Define New Pipeline Stage</span>
+        </h4>
+        <form onsubmit="AdminPortal.submitCreatePipelineStage(event)" class="space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-stage-key">Stage Key (Unique)</label>
+              <input type="text" id="new-stage-key" required placeholder="e.g. CRYO_QUAL"
+                     class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-stage-name">Stage Display Name</label>
+              <input type="text" id="new-stage-name" required placeholder="e.g. Cryogenic Qualification"
+                     class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-stage-seq">Sequence Order</label>
+              <input type="number" id="new-stage-seq" required min="1" max="99" value="10"
+                     class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-stage-desc">Description</label>
+            <input type="text" id="new-stage-desc" placeholder="Operational checklist and gate requirements..."
+                   class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow-sm">
+              + Add Pipeline Stage
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="flex items-center justify-end pt-4 border-t border-gray-100 mt-4">
+        <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: EDIT PIPELINE STAGE                                    -->
+  <!-- ============================================================= -->
+  <div id="modal-edit-stage" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>✏️</span><span>Modify Pipeline Stage</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Update stage configuration for <strong id="edit-stage-key-badge" class="font-mono text-gray-800">STAGE</strong>
+      </p>
+
+      <div id="edit-stage-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold"></div>
+
+      <form onsubmit="AdminPortal.submitUpdatePipelineStage(event)" class="space-y-4">
+        <input type="hidden" id="edit-stage-id">
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="edit-stage-name">Stage Display Name</label>
+          <input type="text" id="edit-stage-name" required
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="edit-stage-seq">Sequence Order (Position in Pipeline)</label>
+          <input type="number" id="edit-stage-seq" required min="1" max="99"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="edit-stage-desc">Description & Quality Gates</label>
+          <input type="text" id="edit-stage-desc"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: MANAGE CUSTOM ROLES                                    -->
+  <!-- ============================================================= -->
+  <div id="modal-manage-custom-roles" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>🏷️</span><span>Custom Roles Management</span>
+        </h3>
+        <button onclick="AdminPortal.closeAllModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Defined specialized line roles for <strong id="custom-roles-pu-name-modal" class="text-gray-800">Production Unit</strong>
+      </p>
+
+      <div id="custom-roles-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold"></div>
+
+      <!-- Current Custom Roles List -->
+      <div class="mb-6 space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-600">Existing Custom Roles</h4>
+        <div id="custom-roles-list-container" class="space-y-2 text-xs">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Add New Custom Role Form -->
+      <div class="p-4 bg-slate-50 border border-gray-200 rounded-xl space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-800 flex items-center space-x-1">
+          <span>➕</span><span>Create New Custom Role</span>
+        </h4>
+        <form onsubmit="AdminPortal.submitCreateCustomRole(event)" class="space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-role-key">Role Key (Identifier)</label>
+              <input type="text" id="new-role-key" required placeholder="e.g. LaserLead"
+                     class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-role-name">Role Display Name</label>
+              <input type="text" id="new-role-name" required placeholder="e.g. Diode Laser Specialist"
+                     class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 mb-1" for="new-role-desc">Description</label>
+            <input type="text" id="new-role-desc" placeholder="Scope of authority, equipment access..."
+                   class="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow-sm">
+              + Define Custom Role
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="flex items-center justify-end pt-4 border-t border-gray-100 mt-4">
+        <button type="button" onclick="AdminPortal.closeAllModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+
+  <footer class="mt-auto border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <span>Masar • © Technology Innovation Institute 2026. All Rights Reserved.</span>
+      <span class="font-mono text-[11px] text-gray-400">TII-QKD Architecture</span>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/hub.js"></script>
+  <script src="js/admin_portal.js"></script>
+</body>
+</html>

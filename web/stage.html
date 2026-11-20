@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stage Team Governance - Masar Manufacturing Portal</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+            <span class="px-2 py-0.2 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              TII-QKD Manufacturing Flow
+            </span>
+          </div>
+          <span class="text-gray-400 text-[11px]">Production Traceability Platform</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong id="header-auth-badge" class="text-emerald-300 font-medium">Active</strong></span>
+        </div>
+        <div class="text-gray-300">
+          User: <strong id="header-user-name" class="text-white">Admin</strong> <span id="header-user-role" class="text-gray-400 font-mono">(Server Admin)</span>
+        </div>
+        <button onclick="StagePage.signOut()" class="text-gray-400 hover:text-rose-400 text-xs transition-colors" title="Sign Out">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-6 flex space-x-1 overflow-x-auto text-xs font-semibold uppercase tracking-wider">
+      <a href="index.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏠</span><span>Main Page</span>
+      </a>
+      <a href="dashboard.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📊</span><span>Dashboard</span>
+      </a>
+      <a href="production.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏭</span><span>Production Status</span>
+      </a>
+      <a href="stock.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📦</span><span>Stock</span>
+      </a>
+      <a href="procurement.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📑</span><span>Procurement</span>
+      </a>
+      <a href="settings.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>⚙️</span><span>Settings</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Body -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1">
+    <!-- Breadcrumb -->
+    <div class="text-xs text-gray-500 mb-4 flex items-center space-x-2">
+      <a href="index.html" class="hover:text-indigo-600 font-medium">Masar Hub</a>
+      <span>/</span>
+      <span id="breadcrumb-pu-name" class="font-semibold text-gray-700">Production Unit</span>
+      <span>/</span>
+      <a id="breadcrumb-pipeline-link" href="pipeline.html" class="hover:text-indigo-600 font-medium">Pipeline Stages</a>
+      <span>/</span>
+      <span id="breadcrumb-stage-name" class="font-semibold text-gray-800 uppercase tracking-wider text-[11px]">
+        Stage Details
+      </span>
+    </div>
+
+    <!-- Stage Hero Overview Card -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-6 shadow-md mb-6 border border-gray-800">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-mono font-black text-2xl shadow-lg shrink-0">
+            <span id="stage-hero-seq">--</span>
+          </div>
+          <div>
+            <div class="flex items-center space-x-3 mb-1">
+              <h1 id="stage-hero-name" class="text-xl font-bold tracking-tight">Stage Name</h1>
+              <span id="stage-hero-key" class="px-2.5 py-0.5 rounded font-mono text-xs font-bold bg-slate-800 text-amber-300 border border-slate-700">
+                STAGE_KEY
+              </span>
+            </div>
+            <p id="stage-hero-desc" class="text-xs text-gray-300 max-w-2xl leading-relaxed">
+              Operational quality gates, component inspections, and equipment checklist for this pipeline stage.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+          <button id="btn-edit-stage" onclick="StagePage.openEditStageModal()"
+                  class="hidden px-3.5 py-2 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 rounded-lg font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>✏️</span>
+            <span>Edit Stage</span>
+          </button>
+          <a id="back-to-pipeline-btn" href="pipeline.html"
+             class="px-3.5 py-2 bg-white text-gray-900 hover:bg-gray-100 rounded-lg font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>←</span>
+            <span>Back to Line</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Previous / Next Stage Bar -->
+      <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between text-xs text-gray-400">
+        <div id="nav-prev-stage" class="flex items-center space-x-1.5">
+          <!-- Populated dynamically -->
+        </div>
+        <div id="nav-next-stage" class="flex items-center space-x-1.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    <!-- =================================================================== -->
+    <!-- STAGE PRODUCTS & PROPERTIES REGISTRY (Purchase, Inspection & Beyond) -->
+    <!-- =================================================================== -->
+    <div id="section-stage-products-registry" class="bg-white border-2 border-indigo-100 rounded-2xl shadow-sm p-6 mb-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-gray-100">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xl">📦</span>
+            <h2 id="stage-registry-title" class="text-sm font-extrabold uppercase tracking-wider text-gray-900">
+              Products & Properties Registry
+            </h2>
+            <span id="stage-registry-count-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-200">
+              0 Products
+            </span>
+          </div>
+          <p id="stage-registry-subtitle" class="text-xs text-gray-500 mt-1 max-w-2xl leading-relaxed">
+            Registered product lots with traceable properties: serial numbers, quantities, storage locations, manufacturers, and custom dynamic fields.
+          </p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button id="btn-registry-add-product" onclick="StagePage.openAddProductModal()"
+                  class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>+</span><span>Add Product</span>
+          </button>
+          <button id="btn-registry-add-field" onclick="StagePage.openAddFieldModal()"
+                  class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>🏷️</span><span>+ Add Field</span>
+          </button>
+          <button onclick="StagePage.loadFinishedProducts()"
+                  class="text-xs px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center space-x-1">
+            <span>↻</span><span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- QA Inspection Filtering Tabs (All / OK / Faulty) -->
+      <div id="stage-inspection-filter-bar" class="mb-4 flex flex-wrap items-center justify-between gap-3 p-2.5 bg-slate-50 rounded-xl border border-gray-200">
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mr-1">Product Status:</span>
+          <button id="filter-btn-all" onclick="StagePage.filterByInspection('ALL')"
+                  class="px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-sm transition-all flex items-center space-x-1">
+            <span>All Products</span>
+            <span id="filter-count-all" class="ml-1 px-1.5 py-0.2 rounded bg-indigo-700/60 text-[10px]">0</span>
+          </button>
+          <button id="filter-btn-ok" onclick="StagePage.filterByInspection('OK')"
+                  class="px-3 py-1.5 rounded-lg font-bold bg-white text-emerald-700 hover:bg-emerald-50 border border-emerald-300 transition-all flex items-center space-x-1">
+            <span>✅ OK (Conforming)</span>
+            <span id="filter-count-ok" class="ml-1 px-1.5 py-0.2 rounded bg-emerald-100 text-[10px]">0</span>
+          </button>
+          <button id="filter-btn-faulty" onclick="StagePage.filterByInspection('FAULTY')"
+                  class="px-3 py-1.5 rounded-lg font-bold bg-white text-rose-700 hover:bg-rose-50 border border-rose-300 transition-all flex items-center space-x-1">
+            <span>❌ Faulty (Rejected)</span>
+            <span id="filter-count-faulty" class="ml-1 px-1.5 py-0.2 rounded bg-rose-100 text-[10px]">0</span>
+          </button>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+          <button id="btn-toggle-procured-panel" onclick="StagePage.toggleProcuredPanel()"
+                  class="px-3 py-1.5 rounded-lg font-bold bg-white hover:bg-slate-100 text-teal-800 border border-teal-300 shadow-sm transition-all flex items-center space-x-1.5">
+            <span>📋</span><span>Procured Components Catalog</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Shared Procured Components Catalog Panel (Receive -> Inspect -> Store & Kit) -->
+      <div id="section-procured-catalog-panel" class="hidden mb-6 p-4 bg-teal-50/60 border-2 border-teal-200 rounded-2xl">
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-teal-200">
+          <div>
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-teal-950 flex items-center space-x-2">
+              <span>📥</span><span>Externally Procured Components Catalog (Receive • Inspect • Store & Kit)</span>
+            </h3>
+            <p class="text-xs text-teal-700 mt-0.5">Admin-selected external parts catalog sourced from outside suppliers. Shared across Receive, Inspect, and Store & Kit.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="btn-add-procured-component" onclick="StagePage.openAddProcuredModal()"
+                    class="hidden px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1">
+              <span>+</span><span>Add Procured Part</span>
+            </button>
+            <button onclick="StagePage.toggleProcuredPanel()" class="text-teal-700 hover:text-teal-900 font-bold text-sm px-2">✕</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-teal-200 rounded-xl bg-white text-xs">
+          <table class="w-full text-left">
+            <thead class="bg-teal-100/70 text-teal-900 uppercase text-[10px] font-bold">
+              <tr>
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Part Name</th>
+                <th class="py-2.5 px-3">Category</th>
+                <th class="py-2.5 px-3">Supplier</th>
+                <th class="py-2.5 px-3">Specifications</th>
+                <th class="py-2.5 px-3 text-center">Unit</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="procured-components-table-body" class="divide-y divide-teal-100">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Active Stage Custom Fields Chips -->
+      <div class="mb-4 flex flex-wrap items-center gap-1.5">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mr-1">Active Stage Fields:</span>
+        <div id="stage-registry-fields-chips" class="flex flex-wrap items-center gap-1.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Products & Properties Table -->
+      <div class="overflow-x-auto border border-gray-200 rounded-xl">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead id="stage-registry-thead" class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+            <!-- Dynamically populated with columns -->
+          </thead>
+          <tbody id="stage-registry-tbody" class="divide-y divide-gray-100">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mode Switcher Tabs -->
+    <div class="flex items-center space-x-3 border-b border-gray-200 mb-6 pb-2">
+      <button id="tab-btn-manager" onclick="StagePage.switchMode('manager')"
+              class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all bg-indigo-600 text-white shadow-sm">
+        <span>🛡️</span><span>Stage Manager (Admin Mode)</span>
+      </button>
+      <button id="tab-btn-user" onclick="StagePage.switchMode('user')"
+              class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all bg-white text-gray-700 hover:bg-gray-50 border border-gray-200">
+        <span>🔧</span><span>Stage User (Execution Mode)</span>
+      </button>
+      <span class="text-xs text-gray-400 italic ml-auto flex items-center space-x-1">
+        <span>🔄</span><span>You can toggle between Manager configuration and User execution</span>
+      </span>
+    </div>
+
+    <!-- Alert / Status Notice -->
+    <div id="stage-alert" class="hidden mb-6 p-4 rounded-xl border text-xs"></div>
+
+    <!-- =================================================================== -->
+    <!-- MODE 1: STAGE MANAGER (ADMIN MODE)                                  -->
+    <!-- =================================================================== -->
+    <div id="section-stage-manager" class="space-y-8">
+
+      <!-- Output Product & Intermediate Status Definition -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Output Product Definition Card -->
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+          <div class="flex items-center space-x-2 mb-3 pb-2 border-b border-gray-100">
+            <span class="text-base">🏷️</span>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Output Product Definition</h2>
+          </div>
+          <p class="text-xs text-gray-500 mb-4">
+            Define the output product name and code produced by this stage. This code forms the prefix for all generated serial numbers (e.g. <code class="font-mono text-indigo-600">CODE-2026-0001</code>).
+          </p>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1" for="mgr-output-name">Output Product Name</label>
+              <input type="text" id="mgr-output-name" placeholder="e.g. QKD Optical Transmitter Core"
+                     class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1" for="mgr-output-code">Output Product Code (Prefix)</label>
+              <input type="text" id="mgr-output-code" placeholder="e.g. OPT-TX"
+                     class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <button onclick="StagePage.saveStageConfig()"
+                    class="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1.5">
+              <span>💾</span><span>Save Output Configuration</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Intermediate Statuses Card -->
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+          <div class="flex items-center space-x-2 mb-3 pb-2 border-b border-gray-100">
+            <span class="text-base">📋</span>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Intermediate Statuses</h2>
+          </div>
+          <p class="text-xs text-gray-500 mb-4">
+            Operational quality milestones that stage operators progress through before marking as DONE.
+          </p>
+          <div class="space-y-3">
+            <div id="mgr-statuses-container" class="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl min-h-[50px] items-center">
+              <!-- Dynamically rendered status tags -->
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="mgr-new-status-input" placeholder="New status (e.g. ALIGNING, CRYOTEST)"
+                     class="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-lg uppercase font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <button onclick="StagePage.addIntermediateStatusTag()"
+                      class="px-3.5 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-bold shadow-sm">
+                + Add
+              </button>
+            </div>
+            <button onclick="StagePage.saveStageConfig()"
+                    class="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1.5">
+              <span>💾</span><span>Save Status Sequence</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Items Definition Card -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-gray-100">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-base">📥</span>
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Stage Input Items & Traceable Fields</h2>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+              Specify raw materials from Inventory or finished sub-assemblies from previous pipeline stages, including immutable tracking fields (e.g. serial numbers, PO numbers).
+            </p>
+          </div>
+          <button onclick="StagePage.openAddInputItemModal()"
+                  class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow transition-all flex items-center space-x-1.5">
+            <span>+</span><span>Add Input Item</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Component / Product Name</th>
+                <th class="py-2.5 px-3">Supply Source</th>
+                <th class="py-2.5 px-3">Immutable Inherited Fields</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="mgr-input-items-table-body" class="divide-y divide-gray-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Requests Approval Section -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-gray-100">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-base">⚖️</span>
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Procurement & Allocation Approvals</h2>
+              <span id="mgr-requests-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                0 Pending
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+              Review requests from downstream stage users requesting finished products produced by this stage or inventory. Approve by allocating a verified finished product serial number.
+            </p>
+          </div>
+          <button onclick="StagePage.loadProcurementRequests()"
+                  class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded font-medium transition-colors flex items-center space-x-1">
+            <span>↻</span><span>Refresh Requests</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Request ID</th>
+                <th class="py-2.5 px-3">Target / Item</th>
+                <th class="py-2.5 px-3">Requested By / Stage</th>
+                <th class="py-2.5 px-3">Date</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Allocated Serial</th>
+                <th class="py-2.5 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="mgr-requests-table-body" class="divide-y divide-gray-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Stage Team & Multi-Roles Section -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-100">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-base">👥</span>
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Stage Team & Role Authorization</h2>
+              <span id="stage-users-count-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-200">
+                0 Members
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+              Assign stage managers, engineers, and assembly operators. Users can hold multiple roles on this stage.
+            </p>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="StagePage.openAssignAdminModal()"
+                    class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow transition-all flex items-center space-x-1.5">
+              <span>👑</span><span>Assign Stage Manager</span>
+            </button>
+            <button onclick="StagePage.openAssignUserModal()"
+                    class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow transition-all flex items-center space-x-1.5">
+              <span>+</span><span>Authorize User</span>
+            </button>
+            <button onclick="StagePage.openInviteUserModal()"
+                    class="px-3.5 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-xs font-bold shadow transition-all flex items-center space-x-1.5">
+              <span>✉️</span><span>Invite New Member</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Team Table -->
+        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-3 px-4">Member Full Name</th>
+                <th class="py-3 px-4">Email Address</th>
+                <th class="py-3 px-4">Assigned Stage Roles</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stage-users-table-body" class="divide-y divide-gray-100">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODE 2: STAGE USER (EXECUTION MODE)                                 -->
+    <!-- =================================================================== -->
+    <div id="section-stage-user" class="hidden space-y-8">
+
+      <!-- Procurement Request Action Bar & Tracking -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-gray-100">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-base">📦</span>
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Procurement & Component Requests</h2>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+              Request components and materials from cleanroom Inventory or output products from preceding stages. Requests are reviewed and allocated by Stage Managers.
+            </p>
+          </div>
+          <button onclick="StagePage.openRaiseProcurementModal()"
+                  class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow transition-all flex items-center space-x-1.5">
+            <span>+</span><span>Raise Procurement Request</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Item Name</th>
+                <th class="py-2.5 px-3">Source</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Allocated Serial Number</th>
+                <th class="py-2.5 px-3">Approved By</th>
+              </tr>
+            </thead>
+            <tbody id="user-requests-table-body" class="divide-y divide-gray-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Stage Execution & Assembly Station -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-gray-100">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-base">⚙️</span>
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Stage Assembly Station & Quality Gates</h2>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+              Update intermediate operational statuses. When ready, mark this stage DONE to generate the finished product and receive its physical label serial number.
+            </p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-gray-600 font-bold">Current Milestone:</span>
+            <select id="user-current-status-select" onchange="StagePage.updateActiveStatus()"
+                    class="px-3 py-1.5 text-xs border border-indigo-300 bg-indigo-50 font-bold text-indigo-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <!-- Dynamically populated with intermediate statuses -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Assembly Inputs & BoM Form -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
+          <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Input Components & Serial Traceability Checklist:</h3>
+          <div id="user-assembly-inputs-container" class="space-y-3">
+            <!-- Dynamically populated with inputs and serial number inputs -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <div class="text-xs text-gray-500">
+            Output Product: <strong id="user-output-product-summary" class="text-indigo-700">QKD Unit</strong>
+          </div>
+          <button onclick="StagePage.completeStageAndProduce()"
+                  class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold shadow-md transition-all flex items-center space-x-2">
+            <span>✅</span><span>Mark Done & Generate Finished Product</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stage Finished Output Products Table -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-gray-100">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-base">🏆</span>
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">Finished Stage Products</h2>
+            </div>
+            <p class="text-xs text-gray-500 mt-0.5">
+              All serialized units completed in this pipeline stage with clickable Bill of Materials (BoM).
+            </p>
+          </div>
+          <button onclick="StagePage.loadFinishedProducts()"
+                  class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded font-medium transition-colors flex items-center space-x-1">
+            <span>↻</span><span>Refresh Products</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Serial Number</th>
+                <th class="py-2.5 px-3">Product Name</th>
+                <th class="py-2.5 px-3">Product Code</th>
+                <th class="py-2.5 px-3">Created By</th>
+                <th class="py-2.5 px-3">Date</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3 text-right">Interactive BoM</th>
+              </tr>
+            </thead>
+            <tbody id="user-finished-products-table-body" class="divide-y divide-gray-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: ADD INPUT ITEM                                          -->
+  <!-- ============================================================= -->
+  <div id="modal-add-input-item" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>📥</span><span>Define Stage Input Item</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Specify input required from Inventory or an earlier pipeline stage.
+      </p>
+
+      <form onsubmit="StagePage.submitAddInputItem(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="input-item-source">Supply Source</label>
+          <select id="input-item-source" onchange="StagePage.onInputSourceChange()" required
+                  class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="INVENTORY">Cleanroom Inventory Stock</option>
+            <option value="PREVIOUS_STAGE">Preceding Pipeline Stage</option>
+          </select>
+        </div>
+
+        <div id="input-source-stage-group" class="hidden">
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="input-source-stage-select">Select Preceding Stage</label>
+          <select id="input-source-stage-select"
+                  class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <!-- Dynamically populated with earlier pipeline stages -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="input-item-code">Component Code</label>
+          <input type="text" id="input-item-code" required placeholder="e.g. OPT-LD-1550"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="input-item-name">Component / Product Name</label>
+          <input type="text" id="input-item-name" required placeholder="e.g. Pulsed Laser Diode 1550nm"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="input-item-immutables">Immutable Inherited Fields (comma-separated)</label>
+          <input type="text" id="input-item-immutables" placeholder="Serial Number, PO Number, Wavelength"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <p class="text-[10px] text-gray-400 mt-1">Fields that cannot be altered and must be tracked forward into the BoM.</p>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Save Input Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: APPROVE PROCUREMENT REQUEST                            -->
+  <!-- ============================================================= -->
+  <div id="modal-approve-request" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>✅</span><span>Approve Procurement Request</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Allocate an authorized finished product serial number for <strong id="modal-approve-item-name" class="text-gray-800">Item</strong>.
+      </p>
+
+      <form onsubmit="StagePage.submitApproveRequest(event)" class="space-y-4">
+        <input type="hidden" id="approve-request-id">
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="approve-allocated-serial">Select / Enter Serial Number</label>
+          <input type="text" id="approve-allocated-serial" required placeholder="e.g. OPT-TX-2026-0001"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          <div id="approve-serial-suggestions" class="mt-2 space-y-1">
+            <!-- Populated with finished products from this stage if any -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">Authorize & Allocate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: RAISE PROCUREMENT REQUEST                              -->
+  <!-- ============================================================= -->
+  <div id="modal-raise-request" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>📦</span><span>Raise Procurement Request</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Submit request to Stage Managers or Cleanroom Inventory.
+      </p>
+
+      <form onsubmit="StagePage.submitRaiseProcurementRequest(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="raise-req-source">Procurement Source</label>
+          <select id="raise-req-source" onchange="StagePage.onRaiseSourceChange()" required
+                  class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="INVENTORY">Cleanroom Inventory</option>
+            <option value="PREVIOUS_STAGE">Preceding Pipeline Stage</option>
+          </select>
+        </div>
+
+        <div id="raise-req-source-stage-group" class="hidden">
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="raise-req-source-stage">Select Preceding Stage</label>
+          <select id="raise-req-source-stage"
+                  class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="raise-req-item-code">Item / Part Code</label>
+          <input type="text" id="raise-req-item-code" required placeholder="e.g. DET-SNSPD-01"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="raise-req-item-name">Item Description</label>
+          <input type="text" id="raise-req-item-name" required placeholder="e.g. Single Photon Detector"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: STICKER / SERIAL LABEL PROMPT                          -->
+  <!-- ============================================================= -->
+  <div id="modal-sticker-prompt" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border-4 border-emerald-500 text-center animate-fade-in">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+        🏷️
+      </div>
+      <h3 class="text-lg font-black text-gray-900 mb-1">Stage Completed Successfully!</h3>
+      <p class="text-xs text-gray-500 mb-4">
+        A new finished product has been registered and verified in Masar traceability.
+      </p>
+
+      <!-- Sticker Physical Representation -->
+      <div class="bg-amber-50 border-2 border-dashed border-amber-400 rounded-xl p-5 mb-5 text-left relative overflow-hidden shadow-inner">
+        <div class="text-[9px] font-black uppercase tracking-widest text-amber-800 mb-1 flex items-center justify-between">
+          <span>MASAR TRACEABILITY STICKER</span>
+          <span class="font-mono">TII-QKD</span>
+        </div>
+        <div class="text-xs text-gray-600 mb-2 font-medium" id="sticker-prod-name">Product Name</div>
+        <div class="text-xl font-black font-mono tracking-wider text-gray-900 bg-white py-2 px-3 rounded border border-gray-300 text-center select-all" id="sticker-serial-number">
+          OPT-2026-0001
+        </div>
+        <div class="mt-2 text-[10px] text-amber-900 font-bold flex items-center space-x-1">
+          <span>⚠️</span>
+          <span>STICK THIS SERIAL NUMBER ON THE PRODUCT IMMEDIATELY</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center space-x-3">
+        <button onclick="window.print()" class="px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-bold shadow-sm flex items-center space-x-1.5">
+          <span>🖨️</span><span>Print Sticker</span>
+        </button>
+        <button onclick="StagePage.closeModals()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">
+          Got It, Done!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: INTERACTIVE BILL OF MATERIALS (BoM)                    -->
+  <!-- ============================================================= -->
+  <div id="modal-interactive-bom" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl p-6 border border-gray-100 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">🧬</span>
+          <div>
+            <h3 class="text-base font-bold text-gray-900" id="bom-modal-title">Bill of Materials (BoM)</h3>
+            <span class="text-xs font-mono text-indigo-600 font-bold" id="bom-modal-serial">SERIAL-NUMBER</span>
+          </div>
+        </div>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <div class="overflow-y-auto space-y-4 my-4 flex-1 pr-1">
+        <!-- Immutable Fields Card -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">
+          <h4 class="font-bold text-slate-700 mb-2 uppercase text-[10px] tracking-wider">Immutable Product Attributes</h4>
+          <div id="bom-modal-immutable-fields" class="grid grid-cols-2 gap-2 text-xs">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- BoM Component Tree / Cards -->
+        <div class="border border-gray-200 rounded-xl overflow-hidden text-xs">
+          <div class="bg-gray-50 px-3 py-2 border-b border-gray-200 font-bold text-gray-700 uppercase text-[10px] tracking-wider">
+            Assembled Sub-Components & Serial Numbers
+          </div>
+          <div id="bom-modal-components-list" class="divide-y divide-gray-100">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end pt-3 border-t border-gray-100">
+        <button type="button" onclick="StagePage.closeModals()" class="px-5 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-xs font-bold shadow-sm">
+          Close BoM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals for Stage Team Assignment (Existing) -->
+  <div id="modal-assign-stage-admin" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>👑</span><span>Assign Stage Manager / Admin</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Grant Stage Manager authority for <strong id="modal-assign-admin-st-name" class="text-gray-800">Stage</strong>
+      </p>
+
+      <form onsubmit="StagePage.submitAssignAdmin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="select-admin-user">Select Member</label>
+          <select id="select-admin-user" required class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-sm">Assign Manager</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-assign-user-role" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>➕</span><span>Authorize User on Stage</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="StagePage.submitAssignUserWithRoles(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="select-existing-user">Select Member</label>
+          <select id="select-existing-user" required class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-2">Assign Stage Roles</label>
+          <div id="assign-user-roles-checkboxes" class="space-y-2 border border-gray-200 rounded-lg p-3 bg-gray-50/50 max-h-48 overflow-y-auto text-xs">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Authorize</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-invite-stage-user" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>✉️</span><span>Invite New Member to Stage</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="StagePage.submitInviteNewUserToStage(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="invite-stage-email">Member Email</label>
+          <input type="email" id="invite-stage-email" required placeholder="engineer@tii.ae"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-gray-700" for="invite-stage-otp">One-Time Password (OTP)</label>
+            <button type="button" onclick="StagePage.generateRandomOTP('invite-stage-otp')"
+                    class="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold">
+              🎲 Generate OTP
+            </button>
+          </div>
+          <input type="text" id="invite-stage-otp" required minlength="8"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-2">Assign Initial Roles</label>
+          <div id="invite-stage-roles-checkboxes" class="space-y-2 border border-gray-200 rounded-lg p-3 bg-gray-50/50 max-h-48 overflow-y-auto text-xs">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Send Invitation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-add-single-role" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>➕</span><span>Add Role on this Stage</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="StagePage.submitAddSingleRole(event)" class="space-y-4">
+        <input type="hidden" id="single-role-user-id">
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="select-single-role">Select Role</label>
+          <select id="select-single-role" required class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Grant Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-edit-stage" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>✏️</span><span>Modify Pipeline Stage</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="StagePage.submitUpdateStage(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="edit-stage-name">Stage Display Name</label>
+          <input type="text" id="edit-stage-name" required
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="edit-stage-seq">Sequence Order</label>
+          <input type="number" id="edit-stage-seq" required min="1" max="99"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="edit-stage-desc">Description</label>
+          <input type="text" id="edit-stage-desc"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  <!-- ============================================================= -->
+  <!-- MODAL: ADD STAGE PRODUCT (ADMINS ONLY)                         -->
+  <!-- ============================================================= -->
+  <div id="modal-add-stage-product" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>📦</span><span>Add Product to Stage Registry</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Register a new product lot for <strong id="modal-product-stage-name" class="text-gray-800">Stage</strong> with serial number, quantity, storage, manufacturer, and custom properties.
+      </p>
+
+      <form onsubmit="StagePage.submitAddProduct(event)" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="newprod-name">Product Name *</label>
+            <input type="text" id="newprod-name" required placeholder="e.g. Cryopump Compressor Unit"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="newprod-code">Product Code *</label>
+            <input type="text" id="newprod-code" required placeholder="e.g. MAT-PO-CRYOPUMP"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="newprod-serial">Serial Number</label>
+            <input type="text" id="newprod-serial" placeholder="Auto if blank"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="newprod-quantity">Quantity *</label>
+            <input type="text" id="newprod-quantity" required value="1" placeholder="e.g. 1, 10, 50m"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="newprod-storage">Storage Location</label>
+            <input type="text" id="newprod-storage" placeholder="e.g. Dock A-1, Bay C"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="newprod-manufacturer">Manufacturer</label>
+          <input type="text" id="newprod-manufacturer" placeholder="e.g. Cryomech, Semrock, Thorlabs"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Dynamic Custom Fields Container -->
+        <div id="newprod-dynamic-fields-section" class="hidden pt-3 border-t border-gray-100">
+          <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wider mb-2">Stage Dynamic Custom Fields</label>
+          <div id="newprod-dynamic-fields-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Dynamically populated based on stage.custom_fields -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" id="btn-save-newprod" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Add Product to Stage</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: ADD DYNAMIC CUSTOM FIELD (ADMINS ONLY)                  -->
+  <!-- ============================================================= -->
+  <div id="modal-add-stage-field" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>🏷️</span><span>Add Dynamic Stage Field</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Define a new custom property for products in <strong id="modal-field-stage-name" class="text-gray-800">Stage</strong> (e.g. Purchase Order, Batch Number, Inspection Status, Tolerance Deviation, Warranty Period).
+      </p>
+
+      <form onsubmit="StagePage.submitAddField(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="newfield-name">Field Name *</label>
+          <input type="text" id="newfield-name" required placeholder="e.g. Calibration Expiry Date"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <p class="text-[10px] text-gray-400 mt-1">This field will immediately appear as a column in the product list and in the Add Product form.</p>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" id="btn-save-newfield" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Save Dynamic Field</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: EDIT PRODUCT PROPERTIES (IMMUTABLE PRODUCT IDENTITY)    -->
+  <!-- ============================================================= -->
+  <div id="modal-edit-product-properties" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>✏️</span><span>Edit Product Properties</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+
+      <!-- Immutability Notice Banner -->
+      <div class="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs mb-4 flex items-start space-x-2.5">
+        <span class="text-base">🔒</span>
+        <div>
+          <strong class="font-bold">Product Identity is Immutable:</strong>
+          <p class="text-[11px] text-amber-800 mt-0.5">
+            Once registered by the Server Administrator, the product serial number, product code, product name, and manufacturing stage are immutable and cannot be altered or deleted. Only properties (quantity, storage location, manufacturer, and dynamic stage attributes) can be modified.
+          </p>
+        </div>
+      </div>
+
+      <form onsubmit="StagePage.submitEditProductProperties(event)" class="space-y-4">
+        <input type="hidden" id="editprod-id">
+
+        <!-- Read-only Immutable Identification Section -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center space-x-1">
+            <span>🔒</span><span>Immutable Identification</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Product Name</label>
+              <input type="text" id="editprod-name" readonly
+                     class="w-full px-2.5 py-1.5 text-xs bg-slate-100 border border-slate-300 rounded-lg text-slate-700 cursor-not-allowed font-medium">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Product Code</label>
+              <input type="text" id="editprod-code" readonly
+                     class="w-full px-2.5 py-1.5 text-xs bg-slate-100 border border-slate-300 rounded-lg text-slate-700 font-mono cursor-not-allowed font-medium">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Serial Number</label>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="editprod-serial" readonly
+                     class="w-full px-2.5 py-1.5 text-xs bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-900 font-mono font-bold cursor-not-allowed">
+              <span class="px-2 py-1 rounded bg-indigo-100 text-indigo-800 text-[10px] font-bold whitespace-nowrap">🔒 Fixed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editable Properties Section -->
+        <div class="space-y-3 pt-1">
+          <div class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 flex items-center space-x-1">
+            <span>✏️</span><span>Editable Properties</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1" for="editprod-quantity">Quantity *</label>
+              <input type="text" id="editprod-quantity" required placeholder="e.g. 1, 10, 50m"
+                     class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1" for="editprod-storage">Storage Location</label>
+              <input type="text" id="editprod-storage" placeholder="e.g. Dock A-1, Bay C"
+                     class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="editprod-manufacturer">Manufacturer</label>
+            <input type="text" id="editprod-manufacturer" placeholder="e.g. Cryomech, Semrock, Thorlabs"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+          </div>
+
+          <!-- Dynamic Custom Fields Container -->
+          <div id="editprod-dynamic-fields-section" class="pt-2 border-t border-gray-100">
+            <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wider mb-2">Stage Dynamic Custom Fields</label>
+            <div id="editprod-dynamic-fields-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <!-- Dynamically populated based on stage.custom_fields -->
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" id="btn-save-editprod" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-sm flex items-center space-x-1.5">
+            <span>💾</span><span>Save Properties</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: QA INSPECTION ACTION (OK vs FAULTY + DEFECT REASON)    -->
+  <!-- ============================================================= -->
+  <div id="modal-inspect-action" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+            <span>🔍</span><span>Quality Assurance Inspection</span>
+          </h3>
+          <p id="inspect-modal-subtitle" class="text-xs text-gray-500 mt-0.5">Evaluate item conformity and record parameters</p>
+        </div>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <form id="form-inspect-product" onsubmit="StagePage.submitInspectAction(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="inspect-product-id" value="">
+
+        <!-- Product Summary Box -->
+        <div class="p-3 bg-slate-50 rounded-xl border border-gray-200 grid grid-cols-2 gap-2">
+          <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase block">Product Name</span>
+            <span id="inspect-prod-name" class="font-bold text-gray-900 text-xs">--</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase block">Serial Number</span>
+            <span id="inspect-prod-serial" class="font-mono font-bold text-indigo-700 text-xs">--</span>
+          </div>
+        </div>
+
+        <!-- Verdict Radio Options (OK vs Faulty) -->
+        <div>
+          <label class="block font-bold text-gray-800 mb-1.5 uppercase text-[11px] tracking-wider">
+            Inspection Verdict <span class="text-rose-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center space-x-2.5 p-3 rounded-xl border-2 border-emerald-300 bg-emerald-50/50 cursor-pointer hover:bg-emerald-50 transition-colors">
+              <input type="radio" name="inspect-verdict" value="OK" checked
+                     onchange="StagePage.onInspectVerdictChange()"
+                     class="text-emerald-600 focus:ring-emerald-500">
+              <div>
+                <span class="font-bold text-emerald-950 block text-xs">✅ OK (Conforming)</span>
+                <span class="text-[10px] text-emerald-700">Meets specifications; eligible for Store & Kit.</span>
+              </div>
+            </label>
+
+            <label class="flex items-center space-x-2.5 p-3 rounded-xl border-2 border-rose-300 bg-rose-50/50 cursor-pointer hover:bg-rose-50 transition-colors">
+              <input type="radio" name="inspect-verdict" value="FAULTY"
+                     onchange="StagePage.onInspectVerdictChange()"
+                     class="text-rose-600 focus:ring-rose-500">
+              <div>
+                <span class="font-bold text-rose-950 block text-xs">❌ Faulty (Rejected)</span>
+                <span class="text-[10px] text-rose-700">Out of spec; mark as rejected with defect reason.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Defect Reason (Required when FAULTY) -->
+        <div id="inspect-defect-reason-group" class="hidden">
+          <label class="block font-bold text-rose-800 mb-1">
+            Defect / Non-Conformance Reason <span class="text-rose-600">*</span>
+          </label>
+          <textarea id="inspect-defect-reason" rows="2" placeholder="Detail reason for rejection (e.g. Optical power below -4.0 dBm threshold, scratched coating, high jitter)..."
+                    class="w-full px-3 py-2 border border-rose-300 rounded-lg bg-rose-50/30 focus:ring-2 focus:ring-rose-500"></textarea>
+        </div>
+
+        <!-- Dynamic Parameter Entry for this stage (e.g. 10 at Inspect) -->
+        <div class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-200/70 space-y-2">
+          <div class="text-[11px] font-bold text-indigo-900 uppercase tracking-wider flex items-center justify-between">
+            <span>📊 Inspection Tracking Parameters</span>
+            <span id="inspect-params-count-badge" class="font-mono text-[10px] text-indigo-700">Assigned: 0</span>
+          </div>
+          <div id="inspect-parameters-input-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Dynamically populated with assigned stage parameters -->
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm">
+            Submit Inspection Verdict
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: ADD PROCURED COMPONENT (ADMIN ONLY)                    -->
+  <!-- ============================================================= -->
+  <div id="modal-add-procured-part" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>📥</span><span>Add Externally Procured Part</span>
+        </h3>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <form onsubmit="StagePage.submitAddProcuredPart(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Item Code / Part Number <span class="text-rose-500">*</span></label>
+          <input type="text" id="proc-code" required placeholder="e.g. OPT-LD-1550-DFB"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono uppercase focus:ring-2 focus:ring-teal-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Part Name <span class="text-rose-500">*</span></label>
+          <input type="text" id="proc-name" required placeholder="e.g. DFB Pulsed Laser Diode 1550nm"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Category</label>
+            <input type="text" id="proc-category" placeholder="Optical Systems / Lasers"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Supplier / Vendor</label>
+            <input type="text" id="proc-supplier" placeholder="Advanced Optical Foundry"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Unit of Measure</label>
+            <input type="text" id="proc-unit" value="PCS"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase focus:ring-2 focus:ring-teal-500">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Key Specification</label>
+            <input type="text" id="proc-spec" placeholder="1550nm, 50ps pulse width"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-gray-100">
+          <button type="button" onclick="StagePage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg shadow-sm">
+            Save Procured Part
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: CARRIED-FORWARD PARAMETERS LEDGER                      -->
+  <!-- ============================================================= -->
+  <div id="modal-params-ledger" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+            <span>🧬</span><span>Carried-Forward Parameters Ledger</span>
+          </h3>
+          <p id="ledger-modal-subtitle" class="text-xs text-gray-500 mt-0.5">Historical parameter audit trail carried forward across all pipeline stages</p>
+        </div>
+        <button onclick="StagePage.closeModals()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="border border-gray-200 rounded-xl overflow-hidden text-xs mb-4">
+        <table class="w-full text-left">
+          <thead class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold">
+            <tr>
+              <th class="py-2.5 px-3">Parameter Name</th>
+              <th class="py-2.5 px-3">Key</th>
+              <th class="py-2.5 px-3">Value</th>
+              <th class="py-2.5 px-3">Recorded At Stage</th>
+              <th class="py-2.5 px-3">Recorded By</th>
+              <th class="py-2.5 px-3">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-params-table-body" class="divide-y divide-gray-100">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-gray-100 text-xs">
+        <button type="button" onclick="StagePage.closeModals()" class="px-5 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800">
+          Close Ledger
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <span>Masar • © Technology Innovation Institute 2026. All Rights Reserved.</span>
+      <span class="font-mono text-[11px] text-gray-400">TII-QKD Architecture</span>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/stage.js"></script>
+</body>
+</html>

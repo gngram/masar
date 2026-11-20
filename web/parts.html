@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parts & BoM Explorer - Masar Manufacturing Portal</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+            <span class="px-2 py-0.2 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              InvenTree Engine
+            </span>
+          </div>
+          <span class="text-gray-400 text-[11px]">Parts Catalog & Bill of Materials Explorer</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong id="header-auth-badge" class="text-emerald-300 font-medium">Active</strong></span>
+        </div>
+        <div class="text-gray-300">
+          User: <strong id="header-user-name" class="text-white">Admin</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1">
+    <!-- Breadcrumb -->
+    <div class="text-xs text-gray-500 mb-4 flex items-center space-x-2">
+      <a href="index.html" class="hover:text-indigo-600 font-medium">Masar Hub</a>
+      <span>/</span>
+      <span class="font-semibold text-gray-800 uppercase tracking-wider text-[11px]">
+        InvenTree Parts & BoM Architecture
+      </span>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+          <span>🧩</span>
+          <span>Parts Catalog & Hierarchical Bill of Materials (BoM)</span>
+        </h1>
+        <p class="text-xs text-gray-500 mt-1 max-w-2xl">
+          InvenTree-style multi-level assembly hierarchies, critical optical/semiconductor parts catalog, hardware revisions, and cryptographic BoM verification.
+        </p>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <button onclick="PartsPage.openCreatePartModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm transition-colors flex items-center space-x-1.5">
+          <span>+</span><span>New Part</span>
+        </button>
+        <button onclick="PartsPage.loadAll()" class="px-3.5 py-2 bg-white hover:bg-gray-100 text-gray-700 font-semibold border border-gray-300 rounded-lg transition-colors">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- InvenTree-Style Tab Navigation -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-6">
+      <div class="inventree-tabs border-b border-gray-200 bg-gray-50/50">
+        <button id="tab-btn-catalog" onclick="PartsPage.switchTab('catalog')" class="inventree-tab-btn active">
+          <span>📋</span><span>Parts Catalog</span>
+        </button>
+        <button id="tab-btn-bom" onclick="PartsPage.switchTab('bom')" class="inventree-tab-btn">
+          <span>🌳</span><span>BoM Hierarchy Explorer</span>
+        </button>
+        <button id="tab-btn-builds" onclick="PartsPage.switchTab('builds')" class="inventree-tab-btn">
+          <span>🏭</span><span>Build Orders</span>
+        </button>
+        <button id="tab-btn-params" onclick="PartsPage.switchTab('params')" class="inventree-tab-btn">
+          <span>⚡</span><span>Specifications & Parameters</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="p-6">
+        <!-- 1. Parts Catalog Tab -->
+        <div id="tab-pane-catalog" class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
+            <div class="flex items-center space-x-2">
+              <input type="text" id="part-search-input" onkeyup="PartsPage.filterParts()" placeholder="Search parts by IPN or name..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs w-64 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              <select id="part-cat-filter" onchange="PartsPage.filterParts()" class="border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs bg-white">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+            <div class="text-xs text-gray-500">
+              Total Parts: <span id="parts-total-count" class="font-bold text-gray-800">--</span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs table-compact">
+              <thead>
+                <tr class="bg-slate-50 border-b border-gray-200 text-gray-500 font-bold uppercase text-[10px]">
+                  <th class="py-2.5 px-3">IPN (Internal Code)</th>
+                  <th class="py-2.5 px-3">Part Name</th>
+                  <th class="py-2.5 px-3">Category</th>
+                  <th class="py-2.5 px-3">Revision</th>
+                  <th class="py-2.5 px-3">Type</th>
+                  <th class="py-2.5 px-3">Default Location</th>
+                  <th class="py-2.5 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="parts-table-body" class="divide-y divide-gray-100">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. BoM Hierarchy Explorer Tab -->
+        <div id="tab-pane-bom" class="hidden space-y-4">
+          <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-gray-200">
+            <div>
+              <span class="text-xs font-bold text-gray-500 block uppercase">Select Parent Assembly:</span>
+              <select id="bom-assembly-select" onchange="PartsPage.loadBoMForSelected()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-bold bg-white mt-1 w-80">
+                <!-- Assemblies injected -->
+              </select>
+            </div>
+            <button onclick="PartsPage.openAddBoMItemModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors">
+              + Add Component to BoM
+            </button>
+          </div>
+
+          <div class="border border-gray-200 rounded-xl overflow-hidden">
+            <table class="w-full text-left border-collapse text-xs table-compact">
+              <thead>
+                <tr class="bg-slate-50 border-b border-gray-200 text-gray-500 font-bold uppercase text-[10px]">
+                  <th class="py-2.5 px-3">Component Code</th>
+                  <th class="py-2.5 px-3">Item Name</th>
+                  <th class="py-2.5 px-3">Reference</th>
+                  <th class="py-2.5 px-3">Qty</th>
+                  <th class="py-2.5 px-3">Critical Path</th>
+                  <th class="py-2.5 px-3">Checksum SHA-256</th>
+                  <th class="py-2.5 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bom-items-table-body" class="divide-y divide-gray-100">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. Build Orders Tab -->
+        <div id="tab-pane-builds" class="hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Active Assembly Build Runs</h3>
+            <button onclick="PartsPage.openCreateBuildModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition-colors">
+              + New Build Order
+            </button>
+          </div>
+          <div id="build-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Build orders injected -->
+          </div>
+        </div>
+
+        <!-- 4. Specifications & Parameters Tab -->
+        <div id="tab-pane-params" class="hidden space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Optical Characterization & Engineering Parameters</h3>
+          <div id="params-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Parameters injected -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Part Modal -->
+  <div id="modal-create-part" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-gray-200 overflow-hidden">
+      <div class="p-5 border-b border-gray-200 bg-slate-900 text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm">Create New Part</h3>
+        <button onclick="PartsPage.closeModals()" class="text-gray-400 hover:text-white font-bold">✕</button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Internal Part Number (IPN)</label>
+          <input type="text" id="new-part-ipn" placeholder="e.g. OPT-LD-1550-CW" class="w-full border border-gray-300 rounded p-2">
+        </div>
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Part Name</label>
+          <input type="text" id="new-part-name" placeholder="e.g. Continuous Wave Laser Diode" class="w-full border border-gray-300 rounded p-2">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Revision</label>
+            <input type="text" id="new-part-rev" value="A" class="w-full border border-gray-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Category</label>
+            <select id="new-part-cat" class="w-full border border-gray-300 rounded p-2 bg-white"></select>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4 pt-2">
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" id="new-part-is-assembly">
+            <span class="font-medium">Is Assembly</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer">
+            <input type="checkbox" id="new-part-is-component" checked>
+            <span class="font-medium">Is Component</span>
+          </label>
+        </div>
+      </div>
+      <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-2">
+        <button onclick="PartsPage.closeModals()" class="px-3.5 py-1.5 border border-gray-300 rounded text-gray-700">Cancel</button>
+        <button onclick="PartsPage.submitCreatePart()" class="px-4 py-1.5 bg-indigo-600 text-white rounded font-bold">Create Part</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/parts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      PartsPage.init();
+    });
+  </script>
+</body>
+</html>

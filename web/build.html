@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Unit: Sub-Assemblies Flow - Masar Manufacturing</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+            <span class="px-2 py-0.2 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              TII-QKD Manufacturing Flow
+            </span>
+          </div>
+          <span class="text-gray-400 text-[11px]">Production Traceability Platform</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong id="header-auth-badge" class="text-emerald-300 font-medium">Active</strong></span>
+        </div>
+        <div class="text-gray-300">
+          User: <strong id="header-user-name" class="text-white">Admin</strong> <span id="header-user-role" class="text-gray-400 font-mono">(Server Admin)</span>
+        </div>
+        <button onclick="BuildPage.signOut()" class="text-gray-400 hover:text-rose-400 text-xs transition-colors" title="Sign Out">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-6 flex space-x-1 overflow-x-auto text-xs font-semibold uppercase tracking-wider">
+      <a href="index.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏠</span><span>Main Page</span>
+      </a>
+      <a href="dashboard.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📊</span><span>Dashboard</span>
+      </a>
+      <a href="production.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏭</span><span>Production Status</span>
+      </a>
+      <a href="stock.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📦</span><span>Stock</span>
+      </a>
+      <a href="procurement.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📑</span><span>Procurement</span>
+      </a>
+      <a href="settings.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>⚙️</span><span>Settings</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Body -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1">
+    <!-- Breadcrumb -->
+    <div class="text-xs text-gray-500 mb-4 flex items-center space-x-2">
+      <a href="index.html" class="hover:text-indigo-600 font-medium">Masar Hub</a>
+      <span>/</span>
+      <span id="breadcrumb-pu-name" class="font-semibold text-gray-700">Production Unit</span>
+      <span>/</span>
+      <a href="pipeline.html" class="hover:text-indigo-600 font-medium">Pipeline Stages</a>
+      <span>/</span>
+      <span class="font-semibold text-amber-700 uppercase tracking-wider text-[11px]">
+        Unit 4: Build (Sub-Assemblies)
+      </span>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md mb-6 border border-gray-800">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+          <div class="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-mono font-black text-2xl shadow-lg shrink-0">
+            4
+          </div>
+          <div>
+            <div class="flex items-center space-x-3 mb-1">
+              <h1 class="text-xl font-bold tracking-tight">Build Unit: Sub-Assemblies & Integration</h1>
+              <span class="px-2.5 py-0.5 rounded font-mono text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                CUSTOMIZABLE FLOW
+              </span>
+            </div>
+            <p class="text-xs text-gray-300 max-w-3xl leading-relaxed">
+              Define, customize, and navigate modular sub-assemblies. Each sub-assembly defines its Bill of Materials (BoM) sourcing components from outside procurement (Store & Kit) or outputs of earlier sub-assemblies, carries forward tracked parameters, and generates output products.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+          <!-- Admin Only Actions -->
+          <button id="btn-admin-add-sub" onclick="BuildPage.openAddSubAssemblyModal()"
+                  class="hidden px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>+</span><span>Add Sub-Assembly</span>
+          </button>
+          <button id="btn-admin-params-catalog" onclick="BuildPage.openParamsCatalogModal()"
+                  class="hidden px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>⚙️</span><span>Parameter Catalog</span>
+          </button>
+          <a href="pipeline.html"
+             class="px-3.5 py-2 bg-white text-gray-900 hover:bg-gray-100 rounded-lg font-bold shadow-sm transition-all flex items-center space-x-1.5">
+            <span>←</span><span>Pipeline Units</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div class="mt-6 pt-4 border-t border-gray-800 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+        <div>
+          <span class="text-gray-400 block text-[10px] uppercase font-bold">Sub-Assemblies</span>
+          <span id="metric-subassembly-count" class="text-lg font-black text-amber-300">--</span>
+        </div>
+        <div>
+          <span class="text-gray-400 block text-[10px] uppercase font-bold">Global Parameter Catalog</span>
+          <span id="metric-parameter-count" class="text-lg font-black text-indigo-300">15 Params</span>
+        </div>
+        <div>
+          <span class="text-gray-400 block text-[10px] uppercase font-bold">Procured Parts Catalog</span>
+          <span id="metric-procured-count" class="text-lg font-black text-emerald-300">--</span>
+        </div>
+        <div>
+          <span class="text-gray-400 block text-[10px] uppercase font-bold">Active WIP Lots</span>
+          <span id="metric-wip-count" class="text-lg font-black text-teal-300">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-Assemblies Explorer Cards Grid (4 Columns) -->
+    <div class="mb-4 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">⚙️</span>
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-gray-900">
+          Sub-Assemblies Execution Chain
+        </h2>
+        <span id="badge-total-subassemblies" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
+          0 Stages
+        </span>
+      </div>
+      <div class="text-xs text-gray-500 font-medium">
+        Click any sub-assembly card to open its dedicated execution station & parameter entry.
+      </div>
+    </div>
+
+    <div id="subassemblies-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Populated dynamically by build.js -->
+    </div>
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: ADD / EDIT SUB-ASSEMBLY (ADMIN ONLY)                    -->
+  <!-- ============================================================== -->
+  <div id="modal-subassembly" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <h3 id="modal-subassembly-title" class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>⚙️</span><span>Add Sub-Assembly</span>
+        </h3>
+        <button onclick="BuildPage.closeSubAssemblyModal()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <form id="form-subassembly" onsubmit="BuildPage.saveSubAssembly(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="sub-edit-key" value="">
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Sub-Assembly Name <span class="text-rose-500">*</span></label>
+          <input type="text" id="sub-name" required placeholder="e.g. Optical Engine Sub-Assembly"
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Stage Key <span class="text-rose-500">*</span></label>
+            <input type="text" id="sub-key" required placeholder="BUILD_OPTICAL"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono focus:ring-2 focus:ring-amber-500 uppercase">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Sequence Number</label>
+            <input type="number" id="sub-sequence" min="1" value="1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Description</label>
+          <textarea id="sub-desc" rows="2" placeholder="Functional description, assembly guidelines, or quality checks..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"></textarea>
+        </div>
+
+        <!-- Output Product Definition -->
+        <div class="p-3 bg-amber-50/70 rounded-xl border border-amber-200/80 space-y-3">
+          <div class="text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center space-x-1.5">
+            <span>🎯</span><span>Define Output Product</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-gray-700 mb-1">Output Product Name</label>
+              <input type="text" id="sub-out-name" placeholder="e.g. Calibrated Optical Engine"
+                     class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div>
+              <label class="block font-bold text-gray-700 mb-1">Output Product Code</label>
+              <input type="text" id="sub-out-code" placeholder="SUB-OPT-ENG-02"
+                     class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg font-mono focus:ring-2 focus:ring-amber-500 uppercase">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+          <button type="button" onclick="BuildPage.closeSubAssemblyModal()"
+                  class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-semibold">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg font-bold shadow-sm">
+            Save Sub-Assembly
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CONFIGURE BoM (BILL OF MATERIALS) (ADMIN ONLY)           -->
+  <!-- ============================================================== -->
+  <div id="modal-bom" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+            <span>📦</span><span>Configure Bill of Materials (BoM)</span>
+          </h3>
+          <p id="modal-bom-sub-name" class="text-xs text-gray-500 mt-0.5">Sub-Assembly: --</p>
+        </div>
+        <button onclick="BuildPage.closeBomModal()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <!-- Add Item Form -->
+      <div class="p-4 bg-slate-50 rounded-xl border border-gray-200 mb-5 text-xs">
+        <div class="font-bold text-gray-800 mb-2 uppercase text-[11px] tracking-wider">
+          + Add Input Component to BoM
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Component Source Origin <span class="text-rose-500">*</span></label>
+            <select id="bom-source-type" onchange="BuildPage.onBomSourceTypeChange()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg font-semibold bg-white">
+              <option value="procured">📥 Externally Procured Part (Store & Kit)</option>
+              <option value="subassembly_output">⚙️ Upstream Sub-Assembly Output</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-gray-700 mb-1">Select Component <span class="text-rose-500">*</span></label>
+            <select id="bom-component-select"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg font-semibold bg-white">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Quantity</label>
+            <input type="number" id="bom-quantity" min="1" step="0.1" value="1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Unit</label>
+            <input type="text" id="bom-unit" value="PCS"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white uppercase">
+          </div>
+          <div class="flex items-end">
+            <button type="button" onclick="BuildPage.addBomItem()"
+                    class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm">
+              + Add to BoM
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current BoM Table -->
+      <div class="text-xs">
+        <div class="font-bold text-gray-800 mb-2 uppercase text-[11px] tracking-wider flex items-center justify-between">
+          <span>Configured BoM Items</span>
+          <span id="bom-items-count-badge" class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono text-[10px]">0 Items</span>
+        </div>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <table class="w-full text-left">
+            <thead class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold">
+              <tr>
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Name</th>
+                <th class="py-2.5 px-3">Origin / Source</th>
+                <th class="py-2.5 px-3 text-center">Qty</th>
+                <th class="py-2.5 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="bom-items-table-body" class="divide-y divide-gray-100">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-4 mt-4 border-t border-gray-100 text-xs">
+        <button type="button" onclick="BuildPage.closeBomModal()"
+                class="px-5 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800">
+          Close BoM Editor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: ASSIGN TRACKING PARAMETERS (ADMIN ONLY)                 -->
+  <!-- ============================================================== -->
+  <div id="modal-params" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+            <span>📊</span><span>Assign Tracking Parameters</span>
+          </h3>
+          <p id="modal-params-sub-name" class="text-xs text-gray-500 mt-0.5">Select parameters active at this stage</p>
+        </div>
+        <button onclick="BuildPage.closeParamsModal()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="text-xs text-gray-600 mb-4 bg-amber-50 p-3 rounded-xl border border-amber-200">
+        Select which parameters from the 15-parameter global catalog must be verified or measured during this sub-assembly. These values will be carried forward continuously into subsequent stages.
+      </div>
+
+      <div id="params-checkbox-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs max-h-80 overflow-y-auto p-1">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="flex items-center justify-between pt-4 mt-4 border-t border-gray-100 text-xs">
+        <span id="params-selected-count" class="font-bold text-indigo-700">0 of 15 Parameters Assigned</span>
+        <div class="space-x-2">
+          <button type="button" onclick="BuildPage.closeParamsModal()"
+                  class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold">
+            Cancel
+          </button>
+          <button type="button" onclick="BuildPage.saveAssignedParameters()"
+                  class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm">
+            Save Assigned Parameters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: GLOBAL PARAMETERS CATALOG (15 DEFAULT PARAMETERS)       -->
+  <!-- ============================================================== -->
+  <div id="modal-catalog" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+        <div>
+          <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+            <span>⚙️</span><span>Global Tracking Parameters Catalog</span>
+          </h3>
+          <p class="text-xs text-gray-500 mt-0.5">Define and maintain the complete parameter catalog across all production units.</p>
+        </div>
+        <button onclick="BuildPage.closeParamsCatalogModal()" class="text-gray-400 hover:text-gray-700 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="border border-gray-200 rounded-xl overflow-hidden text-xs mb-4">
+        <table class="w-full text-left">
+          <thead class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold">
+            <tr>
+              <th class="py-2.5 px-3">Parameter Key</th>
+              <th class="py-2.5 px-3">Display Name</th>
+              <th class="py-2.5 px-3">Unit</th>
+              <th class="py-2.5 px-3">Data Type</th>
+              <th class="py-2.5 px-3">Default Value</th>
+              <th class="py-2.5 px-3 text-center">Critical</th>
+            </tr>
+          </thead>
+          <tbody id="catalog-parameters-table-body" class="divide-y divide-gray-100">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-3 border-t border-gray-100 text-xs">
+        <button type="button" onclick="BuildPage.closeParamsCatalogModal()"
+                class="px-5 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/build.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      BuildPage.init();
+      if (typeof MasarLayout !== 'undefined') {
+        MasarLayout.init();
+      }
+    });
+  </script>
+</body>
+</html>

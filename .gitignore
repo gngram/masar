@@ -1,0 +1,26 @@
+# Python virtual environments & packages
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Test & coverage artifacts
+*.coverprofile
+profile.out
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+

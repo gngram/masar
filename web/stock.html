@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cleanroom Inventory Stock - Masar Manufacturing Portal</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .editable-cell {
+      cursor: pointer;
+      position: relative;
+    }
+    .editable-cell:hover {
+      background-color: #f1f5f9;
+      outline: 1px dashed #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+            <span class="px-2 py-0.2 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              TII-QKD Manufacturing Flow
+            </span>
+          </div>
+          <span class="text-gray-400 text-[11px]">Production Traceability Platform</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong id="header-auth-badge" class="text-emerald-300 font-medium">Active</strong></span>
+        </div>
+        <div class="text-gray-300">
+          User: <strong id="header-user-name" class="text-white">Admin</strong> <span id="header-user-role" class="text-gray-400">(Inventory Manager)</span>
+        </div>
+        <button onclick="InventoryPage.signOut()" class="text-gray-400 hover:text-rose-400 text-xs transition-colors" title="Sign Out">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-6 flex space-x-1 overflow-x-auto text-xs font-semibold uppercase tracking-wider">
+      <a href="index.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏠</span><span>Main Page</span>
+      </a>
+      <a href="dashboard.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📊</span><span>Dashboard</span>
+      </a>
+      <a href="production.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏭</span><span>Production Status</span>
+      </a>
+      <a href="stock.html" class="px-4 py-3 border-b-2 border-indigo-500 text-white bg-gray-800/60 font-bold transition-all flex items-center space-x-1">
+        <span>📦</span><span>Stock</span>
+      </a>
+      <a href="procurement.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📑</span><span>Procurement</span>
+      </a>
+      <a href="settings.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>⚙️</span><span>Settings</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Body -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1">
+    <!-- Breadcrumb -->
+    <div class="text-xs text-gray-500 mb-4 flex items-center space-x-2">
+      <a href="index.html" class="hover:text-indigo-600 font-medium">Masar Hub</a>
+      <span>/</span>
+      <span class="font-semibold text-gray-800 uppercase tracking-wider text-[11px]">
+        Stock & Cleanroom Inventory Management
+      </span>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Title & Controls Header -->
+      <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <h1 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
+            <span>📦</span>
+            <span>Cleanroom Inventory Manager</span>
+          </h1>
+          <p class="text-xs text-gray-500 mt-1 max-w-2xl">
+            Manage components categorized into <strong>Procured</strong>, <strong>Good (Tested OK)</strong>, and <strong>Faulty</strong>. Click on categories to expand/collapse. Double-click any cell to inline edit with confirmation.
+          </p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="InventoryPage.loadAllStock()" class="text-xs px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold transition-colors flex items-center space-x-1.5 shadow-sm">
+            <span>↻</span><span>Refresh Catalog</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-2xl font-bold">
+            📥
+          </div>
+          <div>
+            <span class="text-xs font-bold text-blue-800 uppercase tracking-wider">Procured</span>
+            <div id="stat-procured-count" class="text-2xl font-black text-gray-900 mt-0.5">0</div>
+            <span class="text-[11px] text-gray-500">Materials received in warehouse</span>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-bold">
+            ✅
+          </div>
+          <div>
+            <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Good (Tested OK)</span>
+            <div id="stat-good-count" class="text-2xl font-black text-gray-900 mt-0.5">0</div>
+            <span class="text-[11px] text-gray-500">Verified & cleanroom compliant</span>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-rose-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-2xl font-bold">
+            ⚠️
+          </div>
+          <div>
+            <span class="text-xs font-bold text-rose-800 uppercase tracking-wider">Faulty</span>
+            <div id="stat-faulty-count" class="text-2xl font-black text-gray-900 mt-0.5">0</div>
+            <span class="text-[11px] text-gray-500">Defective / quarantined units</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- CATEGORY 1: PROCURED                                                -->
+      <!-- =================================================================== -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none"
+             onclick="InventoryPage.toggleCategory('procured')">
+          <div class="flex items-center space-x-3">
+            <span id="caret-procured" class="text-sm font-bold text-blue-700 transition-transform">▼</span>
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">📥</span>
+              <h2 class="text-sm font-black text-gray-900 uppercase tracking-wide">Procured</h2>
+              <span id="badge-procured-count" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-900 border border-blue-300">
+                0 Items
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
+            <button onclick="InventoryPage.openAddItemModal('PROCURED')"
+                    class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1">
+              <span>+</span><span>Add Item</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="container-procured" class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Product / Component Name</th>
+                <th class="py-2.5 px-3">Serial Numbers</th>
+                <th class="py-2.5 px-3">Storage Location</th>
+                <th class="py-2.5 px-3">Batch / Lot</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-procured-body" class="divide-y divide-gray-100">
+              <tr><td colspan="7" class="py-6 text-center text-gray-400">Loading procured stock...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- CATEGORY 2: GOOD (TESTED OK)                                        -->
+      <!-- =================================================================== -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none"
+             onclick="InventoryPage.toggleCategory('good')">
+          <div class="flex items-center space-x-3">
+            <span id="caret-good" class="text-sm font-bold text-emerald-700 transition-transform">▼</span>
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">✅</span>
+              <h2 class="text-sm font-black text-gray-900 uppercase tracking-wide">Good (Tested OK)</h2>
+              <span id="badge-good-count" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+                0 Items
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
+            <button onclick="InventoryPage.openAddItemModal('GOOD')"
+                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1">
+              <span>+</span><span>Add Item</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="container-good" class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Product / Component Name</th>
+                <th class="py-2.5 px-3">Serial Numbers</th>
+                <th class="py-2.5 px-3">Storage Location</th>
+                <th class="py-2.5 px-3">Batch / Lot</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-good-body" class="divide-y divide-gray-100">
+              <tr><td colspan="7" class="py-6 text-center text-gray-400">Loading verified stock...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- CATEGORY 3: FAULTY                                                  -->
+      <!-- =================================================================== -->
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-4 bg-gradient-to-r from-rose-50 to-amber-50 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none"
+             onclick="InventoryPage.toggleCategory('faulty')">
+          <div class="flex items-center space-x-3">
+            <span id="caret-faulty" class="text-sm font-bold text-rose-700 transition-transform">▼</span>
+            <div class="flex items-center space-x-2">
+              <span class="text-lg">⚠️</span>
+              <h2 class="text-sm font-black text-gray-900 uppercase tracking-wide">Faulty</h2>
+              <span id="badge-faulty-count" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-900 border border-rose-300">
+                0 Items
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
+            <button onclick="InventoryPage.openAddItemModal('FAULTY')"
+                    class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all flex items-center space-x-1">
+              <span>+</span><span>Add Item</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="container-faulty" class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-wider font-extrabold text-gray-500">
+                <th class="py-2.5 px-3">Item Code</th>
+                <th class="py-2.5 px-3">Product / Component Name</th>
+                <th class="py-2.5 px-3">Serial Numbers</th>
+                <th class="py-2.5 px-3">Storage Location</th>
+                <th class="py-2.5 px-3">Batch / Lot</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-faulty-body" class="divide-y divide-gray-100">
+              <tr><td colspan="7" class="py-6 text-center text-gray-400">Loading faulty stock...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: ADD NEW ITEM TO CATEGORY                                     -->
+  <!-- =================================================================== -->
+  <div id="modal-add-stock-item" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-100">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>➕</span><span>Add Cleanroom Stock Item</span>
+        </h3>
+        <button onclick="InventoryPage.closeModals()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4 pb-2 border-b border-gray-100">
+        Register a new component in category <strong id="modal-add-category-label" class="text-indigo-600">PROCURED</strong>
+      </p>
+
+      <form onsubmit="InventoryPage.submitAddItem(event)" class="space-y-3">
+        <input type="hidden" id="add-item-category">
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-code">Item / Part Code</label>
+          <input type="text" id="add-item-code" required placeholder="e.g. OPT-LD-1550-DFB"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-name">Component / Product Name</label>
+          <input type="text" id="add-item-name" required placeholder="e.g. DFB Pulsed Laser Diode"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-serials">Serial Number(s) (comma-separated)</label>
+          <input type="text" id="add-item-serials" placeholder="e.g. LD-2026-X8812, LD-2026-X8813"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-qty">Quantity</label>
+            <input type="number" id="add-item-qty" value="1" min="1" step="1"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-unit">Unit</label>
+            <input type="text" id="add-item-unit" value="PCS"
+                   class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-location">Storage Location</label>
+          <input type="text" id="add-item-location" placeholder="e.g. Cleanroom Cabinet C-1, Tray A"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1" for="add-item-batch">Batch / Lot Number</label>
+          <input type="text" id="add-item-batch" placeholder="e.g. LOT-LASER-49"
+                 class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="InventoryPage.closeModals()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Save Component</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- MODAL: CONFIRM FIELD UPDATE (DOUBLE-CLICK INLINE EDIT)               -->
+  <!-- =================================================================== -->
+  <div id="modal-confirm-field-update" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 border border-gray-100 text-center animate-fade-in">
+      <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+        ✏️
+      </div>
+      <h3 class="text-base font-bold text-gray-900 mb-1">Confirm Field Update</h3>
+      <p class="text-xs text-gray-500 mb-4">
+        Are you sure you want to update <strong id="confirm-field-name" class="text-gray-900">Field</strong>?
+      </p>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-5 text-left text-xs space-y-1">
+        <div class="text-gray-500 text-[11px]">Old value: <span id="confirm-old-value" class="line-through text-rose-600 font-mono">old</span></div>
+        <div class="text-gray-900 font-bold text-[11px]">New value: <span id="confirm-new-value" class="text-emerald-700 font-mono">new</span></div>
+      </div>
+
+      <div class="flex items-center justify-center space-x-3">
+        <button type="button" onclick="InventoryPage.cancelInlineEdit()"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">
+          Cancel
+        </button>
+        <button type="button" onclick="InventoryPage.applyInlineEdit()"
+                class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm">
+          Yes, Update
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <span>Masar • © Technology Innovation Institute 2026. All Rights Reserved.</span>
+      <span class="font-mono text-[11px] text-gray-400">Cleanroom Inventory Traceability</span>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/stock.js"></script>
+</body>
+</html>

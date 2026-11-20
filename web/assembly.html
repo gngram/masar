@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assembly Units - Masar Manufacturing</title>
+  <link rel="icon" type="image/svg+xml" href="assets/masar-logo.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#1f2937] text-white border-b border-gray-800 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-2.5 flex flex-wrap items-center justify-between border-b border-gray-700/60 text-xs">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-8 h-8 flex items-center justify-center shadow-md rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+          <img src="assets/masar-logo.svg" alt="Masar Logo" class="w-8 h-8">
+        </a>
+        <div>
+          <div class="flex items-center space-x-2">
+            <a href="index.html" class="font-extrabold tracking-wide text-sm hover:text-indigo-300 transition-colors">MASAR</a>
+            <span class="px-2 py-0.2 rounded text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              TII-QKD Manufacturing Flow
+            </span>
+          </div>
+          <span class="text-gray-400 text-[11px]">Production Traceability Platform</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-1.5 px-3 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Auth: <strong id="header-auth-badge" class="text-emerald-300 font-medium">Active</strong></span>
+        </div>
+        <div class="text-gray-300">
+          User: <strong id="header-user-name" class="text-white">Admin</strong> <span id="header-user-role" class="text-gray-400 font-mono">(Server Admin)</span>
+        </div>
+        <button onclick="AssemblyPage.signOut()" class="text-gray-400 hover:text-rose-400 text-xs transition-colors" title="Sign Out">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-6 flex space-x-1 overflow-x-auto text-xs font-semibold uppercase tracking-wider">
+      <a href="index.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏠</span><span>Main Page</span>
+      </a>
+      <a href="dashboard.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📊</span><span>Dashboard</span>
+      </a>
+      <a href="production.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>🏭</span><span>Production Status</span>
+      </a>
+      <a href="stock.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📦</span><span>Stock</span>
+      </a>
+      <a href="procurement.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>📑</span><span>Procurement</span>
+      </a>
+      <a href="settings.html" class="px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-800/30 transition-all flex items-center space-x-1">
+        <span>⚙️</span><span>Settings</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container: Strictly square cards in 4 columns -->
+  <main class="max-w-7xl mx-auto p-6 w-full flex-1 flex flex-col justify-center">
+
+    <!-- VIEW 1: SYSTEM SELECTION VIEW ([Receiver] and [Source] SQUARE CARDS IN 4 COLS) -->
+    <div id="system-selection-container">
+      <div id="system-selection-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <!-- Option 1: Receiver Card (Square) -->
+        <div id="card-selection-receiver" onclick="AssemblyPage.selectSystem('RECEIVER')"
+             class="aspect-square bg-white border-2 border-teal-200 hover:border-teal-500 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group overflow-hidden">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center font-bold text-2xl shadow group-hover:scale-105 transition-transform">
+                📡
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                8 Units
+              </span>
+            </div>
+            <h2 class="text-base font-black text-gray-900 group-hover:text-teal-700 transition-colors">
+              [Receiver]
+            </h2>
+            <p class="text-[11px] font-mono font-bold text-teal-800 uppercase tracking-wider mb-2">
+              Bob Cryo-Station
+            </p>
+            <p class="text-xs text-gray-500 line-clamp-3 leading-relaxed">
+              Superconducting Nanowire Single-Photon Detector (SNSPD), cryostat & optical interconnects.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-teal-700">
+            <span>Open [Receiver] Cards</span>
+            <span class="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </div>
+
+        <!-- Option 2: Source Card (Square) -->
+        <div id="card-selection-source" onclick="AssemblyPage.selectSystem('SOURCE')"
+             class="aspect-square bg-white border-2 border-indigo-200 hover:border-indigo-600 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col justify-between group overflow-hidden">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-2xl shadow group-hover:scale-105 transition-transform">
+                💡
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                6 Units
+              </span>
+            </div>
+            <h2 class="text-base font-black text-gray-900 group-hover:text-indigo-700 transition-colors">
+              [Source]
+            </h2>
+            <p class="text-[11px] font-mono font-bold text-indigo-800 uppercase tracking-wider mb-2">
+              Alice Optical Source
+            </p>
+            <p class="text-xs text-gray-500 line-clamp-3 leading-relaxed">
+              Pulsed laser diode optical bench, variable optical attenuator (VOA) & beam splitter.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-indigo-700">
+            <span>Open [Source] Cards</span>
+            <span class="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: SUB-ASSEMBLY CARDS GRID (SQUARE CARDS IN 4 COLS) -->
+    <div id="system-detail-container" class="hidden">
+      <div id="assembly-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <!-- Dynamically Populated with Sub-Assembly Square Cards -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================================================= -->
+  <!-- MODAL: DEFINE / EDIT BoM (ADMINS ONLY)                         -->
+  <!-- ============================================================= -->
+  <div id="modal-define-bom" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl p-6 border border-gray-100 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-base font-bold text-gray-900 flex items-center space-x-2">
+          <span>🛠️</span><span>Define Bill of Materials (BoM)</span>
+        </h3>
+        <button onclick="AssemblyPage.closeBoMModal()" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
+        Configuring BoM input components for <strong id="modal-bom-stage-name" class="text-gray-800">Stage</strong>
+      </p>
+
+      <div class="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-[11px] mb-4">
+        <strong>Admin Authority Restriction:</strong> Only administrators can edit and define the Bill of Materials. Operators assigned to this unit will receive and consume these exact components.
+      </div>
+
+      <div id="modal-bom-error" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold"></div>
+
+      <form onsubmit="AssemblyPage.saveBoM(event)" class="space-y-4">
+        <!-- Output Product Definition -->
+        <div class="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs">
+          <div>
+            <label class="block font-bold text-gray-700 mb-1" for="modal-bom-outname">Stage Output Product Name</label>
+            <input type="text" id="modal-bom-outname" required
+                   class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-bold text-gray-700 mb-1" for="modal-bom-outcode">Output Product Code</label>
+            <input type="text" id="modal-bom-outcode" required
+                   class="w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg font-mono focus:ring-2 focus:ring-indigo-500 uppercase">
+          </div>
+        </div>
+
+        <!-- Input Items Table -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">Required Input Components (BoM)</span>
+            <button type="button" onclick="AssemblyPage.addBoMRow()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[11px] font-bold shadow-sm">
+              + Add Component
+            </button>
+          </div>
+
+          <div class="overflow-x-auto border border-gray-200 rounded-xl max-h-60 overflow-y-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="bg-gray-50 border-b border-gray-200 text-[10px] uppercase font-bold text-gray-500 sticky top-0">
+                <tr>
+                  <th class="py-2 px-3">Item Code</th>
+                  <th class="py-2 px-3">Item Name</th>
+                  <th class="py-2 px-2 text-center">Qty</th>
+                  <th class="py-2 px-2">Unit</th>
+                  <th class="py-2 px-2 text-center">Serial?</th>
+                  <th class="py-2 px-2 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="bom-items-table-body" class="divide-y divide-gray-100">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-4 border-t border-gray-100">
+          <button type="button" onclick="AssemblyPage.closeBoMModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
+          <button type="submit" id="btn-save-bom" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">Save BoM Configuration</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-gray-200 bg-white py-3 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <span>Masar • © Technology Innovation Institute 2026. All Rights Reserved.</span>
+      <span class="font-mono text-[11px] text-gray-400">TII Industrial Execution</span>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/assembly.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AssemblyPage.init();
+    });
+  </script>
+</body>
+</html>
